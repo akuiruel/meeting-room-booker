@@ -1,5 +1,5 @@
 export type RoomType = 'ruang_diskusi_1' | 'ruang_diskusi_2' | 'ruang_diskusi_3';
-export type DepartmentType = 'IT' | 'HR' | 'Marketing' | 'Finance' | 'Operations';
+export type DepartmentType = 'PRTH' | 'DIRI' | 'SETTAMA' | 'PUSDATIN' | 'LAINNYA';
 export type BookingStatus = 'confirmed' | 'cancelled';
 
 export interface Booking {
@@ -36,11 +36,11 @@ export const ROOMS: { value: RoomType; label: string }[] = [
 ];
 
 export const DEPARTMENTS: { value: DepartmentType; label: string }[] = [
-  { value: 'IT', label: 'IT' },
-  { value: 'HR', label: 'HR' },
-  { value: 'Marketing', label: 'Marketing' },
-  { value: 'Finance', label: 'Finance' },
-  { value: 'Operations', label: 'Operations' },
+  { value: 'PRTH', label: 'PRTH' },
+  { value: 'DIRI', label: 'DIRI' },
+  { value: 'SETTAMA', label: 'SETTAMA' },
+  { value: 'PUSDATIN', label: 'PUSDATIN' },
+  { value: 'LAINNYA', label: 'LAINNYA' },
 ];
 
 export const TIME_SLOTS = [
