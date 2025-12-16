@@ -137,7 +137,7 @@ export const useCancelBooking = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bookings'] });
+      queryClient.invalidateQueries({ queryKey: ['bookings', 'all'] });
       toast({
         title: 'Booking Dibatalkan',
         description: 'Booking telah berhasil dibatalkan.',
