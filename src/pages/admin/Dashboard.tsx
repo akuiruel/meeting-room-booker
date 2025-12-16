@@ -207,7 +207,7 @@ const AdminDashboard = () => {
                 <div className="text-2xl font-bold">{totalConfirmed}</div>
               </CardContent>
             </Card>
-            {roomStats.slice(0, 2).map((room) => (
+            {roomStats.map((room) => (
               <Card key={room.value}>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">
