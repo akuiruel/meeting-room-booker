@@ -194,6 +194,7 @@ export const BookingForm = () => {
                       <FormControl>
                         <Button
                           variant="outline"
+                          data-testid="date-picker-button"
                           className={cn(
                             'w-full pl-3 text-left font-normal',
                             !field.value && 'text-muted-foreground'

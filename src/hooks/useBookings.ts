@@ -135,9 +135,25 @@ export const useCancelBooking = () => {
         .eq('id', id);
 
       if (error) throw error;
+      return id;
     },
-    onSuccess: () => {
+    onSuccess: (id) => {
+      // Manually update the cache to give instant feedback
+      queryClient.setQueryData(
+        ['bookings', 'all'],
+        (oldData: Booking[] | undefined) => {
+          if (!oldData) return [];
+          return oldData.map((booking) =>
+            booking.id === id
+              ? { ...booking, status: 'cancelled' as const }
+              : booking
+          );
+        }
+      );
+
+      // Also invalidate to refetch in the background for consistency
       queryClient.invalidateQueries({ queryKey: ['bookings', 'all'] });
+
       toast({
         title: 'Booking Dibatalkan',
         description: 'Booking telah berhasil dibatalkan.',
