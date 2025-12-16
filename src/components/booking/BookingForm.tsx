@@ -97,9 +97,11 @@ export const BookingForm = () => {
     setShowConfirmation(false);
     form.reset();
   };
-
   const selectedDate = form.watch('usage_date');
   const isWindowOpen = isBookingWindowOpen();
+  const tomorrowDate = getTomorrowDateString();
+  const isTomorrowBooking = selectedDate === tomorrowDate;
+  const canBookTomorrow = isWindowOpen || !isTomorrowBooking;
 
   return (
     <>
@@ -345,11 +347,19 @@ export const BookingForm = () => {
             )}
           />
 
+          {!canBookTomorrow && (
+            <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-center">
+              <p className="text-sm text-destructive font-medium">
+                Booking untuk besok baru dibuka jam 16:00 WIB hari ini
+              </p>
+            </div>
+          )}
+
           <Button
             type="submit"
             size="lg"
             className="w-full"
-            disabled={createBooking.isPending}
+            disabled={createBooking.isPending || !canBookTomorrow}
           >
             {createBooking.isPending ? 'Memproses...' : 'Booking Sekarang'}
           </Button>
