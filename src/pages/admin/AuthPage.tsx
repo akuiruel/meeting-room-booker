@@ -3,7 +3,7 @@ import { useNavigate, Navigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, Key } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,9 +19,15 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
 
+const ACCESS_CODE = '1111';
+
 const authSchema = z.object({
   email: z.string().email('Email tidak valid'),
   password: z.string().min(6, 'Password minimal 6 karakter'),
+  accessCode: z.string().min(1, 'Kode akses wajib diisi'),
+}).refine((data) => data.accessCode === ACCESS_CODE, {
+  message: 'Kode akses tidak valid',
+  path: ['accessCode'],
 });
 
 type AuthFormValues = z.infer<typeof authSchema>;
@@ -37,6 +43,7 @@ const AuthPage = () => {
     defaultValues: {
       email: '',
       password: '',
+      accessCode: '',
     },
   });
 
@@ -45,6 +52,7 @@ const AuthPage = () => {
     defaultValues: {
       email: '',
       password: '',
+      accessCode: '',
     },
   });
 
@@ -149,6 +157,28 @@ const AuthPage = () => {
                     )}
                   />
 
+                  <FormField
+                    control={loginForm.control}
+                    name="accessCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Kode Akses</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Key className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                            <Input
+                              type="password"
+                              placeholder="Masukkan kode akses"
+                              className="pl-10"
+                              {...field}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? 'Memproses...' : 'Login'}
                   </Button>
@@ -206,6 +236,28 @@ const AuthPage = () => {
                                 <Eye className="h-5 w-5" />
                               )}
                             </button>
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={registerForm.control}
+                    name="accessCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Kode Akses</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Key className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                            <Input
+                              type="password"
+                              placeholder="Masukkan kode akses"
+                              className="pl-10"
+                              {...field}
+                            />
                           </div>
                         </FormControl>
                         <FormMessage />

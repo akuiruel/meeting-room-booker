@@ -1,8 +1,8 @@
 import { format, addDays, isAfter, isBefore, parseISO, startOfDay, setHours, setMinutes } from 'date-fns';
 import { id } from 'date-fns/locale';
 
-export const BOOKING_CUTOFF_HOUR = 15;
-export const BOOKING_CUTOFF_MINUTE = 30;
+export const BOOKING_CUTOFF_HOUR = 16;
+export const BOOKING_CUTOFF_MINUTE = 0;
 
 export const formatDate = (date: Date | string, formatStr: string = 'dd MMMM yyyy'): string => {
   const d = typeof date === 'string' ? parseISO(date) : date;

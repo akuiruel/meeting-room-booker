@@ -99,7 +99,17 @@ export type Database = {
     Enums: {
       app_role: "admin" | "user"
       booking_status: "confirmed" | "cancelled"
-      department_type: "IT" | "HR" | "Marketing" | "Finance" | "Operations"
+      department_type:
+        | "IT"
+        | "HR"
+        | "Marketing"
+        | "Finance"
+        | "Operations"
+        | "PRTH"
+        | "DIRI"
+        | "SETTAMA"
+        | "PUSDATIN"
+        | "LAINNYA"
       room_type: "ruang_diskusi_1" | "ruang_diskusi_2" | "ruang_diskusi_3"
     }
     CompositeTypes: {
@@ -230,7 +240,18 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "user"],
       booking_status: ["confirmed", "cancelled"],
-      department_type: ["IT", "HR", "Marketing", "Finance", "Operations"],
+      department_type: [
+        "IT",
+        "HR",
+        "Marketing",
+        "Finance",
+        "Operations",
+        "PRTH",
+        "DIRI",
+        "SETTAMA",
+        "PUSDATIN",
+        "LAINNYA",
+      ],
       room_type: ["ruang_diskusi_1", "ruang_diskusi_2", "ruang_diskusi_3"],
     },
   },

@@ -42,10 +42,10 @@ import { getTomorrow, getTodayDateString, getTomorrowDateString, isBookingWindow
 
 const bookingSchema = z.object({
   booker_name: z.string().min(2, 'Nama minimal 2 karakter').max(100, 'Nama maksimal 100 karakter'),
-  department: z.enum(['IT', 'HR', 'Marketing', 'Finance', 'Operations'], {
+  department: z.enum(['PRTH', 'DIRI', 'SETTAMA', 'PUSDATIN', 'LAINNYA'], {
     required_error: 'Pilih unit kerja',
   }),
-  participant_count: z.coerce.number().min(1, 'Minimal 1 peserta').max(20, 'Maksimal 20 peserta'),
+  participant_count: z.coerce.number().min(1, 'Minimal 1 peserta').max(15, 'Maksimal 15 peserta'),
   usage_date: z.string({ required_error: 'Pilih tanggal' }),
   start_time: z.string({ required_error: 'Pilih jam mulai' }),
   end_time: z.string({ required_error: 'Pilih jam selesai' }),
@@ -167,8 +167,8 @@ export const BookingForm = () => {
                     <Input
                       type="number"
                       min={1}
-                      max={20}
-                      placeholder="1-20 peserta"
+                      max={15}
+                      placeholder="1-15 peserta"
                       {...field}
                     />
                   </FormControl>

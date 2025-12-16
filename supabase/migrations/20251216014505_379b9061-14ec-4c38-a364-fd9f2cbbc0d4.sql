@@ -1,0 +1,6 @@
+-- Add new department types to enum
+ALTER TYPE department_type ADD VALUE IF NOT EXISTS 'PRTH';
+ALTER TYPE department_type ADD VALUE IF NOT EXISTS 'DIRI';
+ALTER TYPE department_type ADD VALUE IF NOT EXISTS 'SETTAMA';
+ALTER TYPE department_type ADD VALUE IF NOT EXISTS 'PUSDATIN';
+ALTER TYPE department_type ADD VALUE IF NOT EXISTS 'LAINNYA';

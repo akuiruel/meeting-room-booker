@@ -32,9 +32,6 @@ const Index = () => {
               Booking Ruang Diskusi
               <span className="block gradient-text">Lebih Mudah & Cepat</span>
             </h1>
-            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Kelola reservasi 3 ruang diskusi dengan mudah. Cek ketersediaan real-time dan booking langsung dalam hitungan detik.
-            </p>
             <div className="flex flex-wrap items-center justify-center gap-4">
               <Button size="lg" className="gap-2" onClick={() => document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth' })}>
                 Booking Sekarang
@@ -59,7 +56,7 @@ const Index = () => {
             {[
               { icon: Calendar, title: '3 Ruang Tersedia', desc: 'Ruang Diskusi 1, 2, dan 3 siap digunakan' },
               { icon: Clock, title: 'Jam 08:00 - 16:00', desc: 'Tersedia setiap hari kerja' },
-              { icon: Users, title: 'Maks 20 Peserta', desc: 'Kapasitas fleksibel per ruang' },
+              { icon: Users, title: 'Maks 15 Peserta', desc: 'Kapasitas fleksibel per ruang' },
             ].map((item, i) => (
               <Card key={i} className="border-0 bg-muted/50 animate-slide-up" style={{ animationDelay: `${i * 100}ms` }}>
                 <CardContent className="flex items-center gap-4 p-6">
