@@ -137,13 +137,11 @@ export const useCancelBooking = () => {
       if (error) throw error;
     },
     onSuccess: () => {
+      queryClient.refetchQueries({ queryKey: ['bookings', 'all'] });
       toast({
         title: 'Booking Dibatalkan',
         description: 'Booking telah berhasil dibatalkan.',
       });
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['bookings', 'all'] });
     },
     onError: (error: Error) => {
       toast({
