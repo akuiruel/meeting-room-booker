@@ -26,7 +26,8 @@ import {
   BarChart3,
   FileSpreadsheet,
   FileText,
-  Menu
+  Menu,
+  LayoutGrid
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
