@@ -294,33 +294,33 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background-light dark:bg-background-dark font-display">
+    <div className="min-h-screen bg-slate-50 font-display">
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-surface-dark hidden lg:block shadow-sm">
-        <div className="flex h-20 items-center gap-3 border-b border-slate-100 dark:border-slate-800 px-6">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-primary to-blue-400 text-white shadow-lg shadow-blue-500/20">
-            <Calendar className="h-5 w-5" />
+      <aside className="fixed left-0 top-0 z-40 h-screen w-64 bg-blue-600 text-white hidden lg:flex flex-col shadow-xl">
+        <div className="flex h-20 items-center gap-3 px-6 border-b border-blue-500/30">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 text-white backdrop-blur-sm">
+            <LayoutGrid className="h-6 w-6" />
           </div>
-          <span className="font-extrabold text-lg text-slate-800 dark:text-white tracking-tight">RuangBook</span>
+          <span className="font-extrabold text-xl tracking-tight">RuangBook</span>
         </div>
 
-        <nav className="flex flex-col gap-2 p-4 mt-2">
+        <nav className="flex-1 flex flex-col gap-2 p-4 mt-2">
           <Link to="/admin/dashboard">
-            <Button variant="ghost" className="w-full justify-start gap-3 px-4 py-6 bg-blue-50 dark:bg-blue-900/20 text-primary font-bold hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-xl transition-all">
+            <Button variant="ghost" className="w-full justify-start gap-3 px-4 py-6 bg-white/10 text-white font-bold hover:bg-white/20 rounded-xl transition-all shadow-sm ring-1 ring-white/5">
               <BarChart3 className="h-5 w-5" />
               Dashboard
             </Button>
           </Link>
           <Link to="/">
-            <Button variant="ghost" className="w-full justify-start gap-3 px-4 py-6 text-slate-500 hover:text-primary hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-all">
+            <Button variant="ghost" className="w-full justify-start gap-3 px-4 py-6 text-blue-100 hover:text-white hover:bg-blue-500/50 rounded-xl transition-all">
               <Home className="h-5 w-5" />
               Kembali ke Beranda
             </Button>
           </Link>
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 border-t border-slate-100 dark:border-slate-800 p-6">
-          <Button variant="ghost" className="w-full justify-start gap-3 px-4 py-6 text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all" onClick={signOut}>
+        <div className="p-6 border-t border-blue-500/30">
+          <Button variant="ghost" className="w-full justify-start gap-3 px-4 py-6 text-blue-100 hover:text-white hover:bg-red-500/20 hover:ring-1 hover:ring-red-400/50 rounded-xl transition-all" onClick={signOut}>
             <LogOut className="h-5 w-5" />
             Logout
           </Button>
@@ -328,56 +328,51 @@ const AdminDashboard = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="lg:pl-64 min-h-screen">
-        <div className="container max-w-7xl mx-auto py-10 px-6">
+      <main className="lg:pl-64 min-h-screen transition-all duration-300">
+        <div className="container max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
             <div>
-              <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Dashboard</h1>
-              <p className="text-slate-500 dark:text-slate-400 mt-1">Kelola semua booking ruang diskusi dengan mudah</p>
+              <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Dashboard</h1>
+              <p className="text-slate-500 mt-1 font-medium">Kelola semua booking ruang diskusi dengan mudah</p>
             </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" onClick={exportToPDF} className="gap-2 hidden sm:flex">
+            <div className="flex items-center gap-3">
+              <Button variant="outline" onClick={exportToPDF} className="gap-2 hidden sm:flex border-blue-200 text-blue-600 hover:bg-blue-50 font-semibold h-10 px-5">
                 <FileText className="h-4 w-4" />
                 Export PDF
               </Button>
-              <Button variant="outline" onClick={exportToCSV} className="gap-2 hidden sm:flex">
+              <Button onClick={exportToCSV} className="gap-2 hidden sm:flex bg-blue-600 hover:bg-blue-700 text-white font-semibold h-10 px-5 shadow-lg shadow-blue-600/20">
                 <FileSpreadsheet className="h-4 w-4" />
                 Export CSV
               </Button>
+
+              {/* Mobile Menu Actions */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="sm:hidden">
+                  <Button variant="outline" size="icon" className="sm:hidden border-blue-200 text-blue-600">
                     <Download className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={exportToPDF}>
-                    <FileText className="h-4 w-4 mr-2" />
-                    Export PDF
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={exportToCSV}>
-                    <FileSpreadsheet className="h-4 w-4 mr-2" />
-                    Export CSV
-                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={exportToPDF}>Export PDF</DropdownMenuItem>
+                  <DropdownMenuItem onClick={exportToCSV}>Export CSV</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="icon" className="lg:hidden">
-                    <Menu className="h-5 w-5" />
+                  <Button variant="ghost" size="icon" className="lg:hidden text-slate-600">
+                    <Menu className="h-6 w-6" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuItem asChild>
-                    <Link to="/" className="flex items-center cursor-pointer">
-                      <Home className="h-4 w-4 mr-2" />
-                      Beranda
+                    <Link to="/" className="flex items-center cursor-pointer p-3">
+                      <Home className="h-4 w-4 mr-3" /> Kembali ke Beranda
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={signOut} className="text-destructive focus:text-destructive cursor-pointer">
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Logout
+                  <DropdownMenuItem onClick={signOut} className="text-red-600 cursor-pointer p-3">
+                    <LogOut className="h-4 w-4 mr-3" /> Logout
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -385,43 +380,64 @@ const AdminDashboard = () => {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Booking Hari Ini
-                </CardTitle>
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{todayBookingsCount}</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Total Booking Aktif
-                </CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{totalConfirmed}</div>
-              </CardContent>
-            </Card>
-            {roomStats.map((room) => (
-              <Card key={room.value}>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    {room.label}
-                  </CardTitle>
-                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{room.percentage}%</div>
-                  <p className="text-xs text-muted-foreground">{room.count} booking</p>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5 mb-8">
+            {/* Booking Hari Ini - Blue Gradient */}
+            <div className="relative overflow-hidden rounded-3xl p-6 bg-gradient-to-br from-blue-500 to-blue-700 shadow-lg shadow-blue-500/20 text-white group hover:scale-[1.02] transition-transform duration-300">
+              <div className="absolute right-0 top-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-white/10 blur-2xl"></div>
+              <div className="relative z-10">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2.5 bg-white/20 rounded-xl backdrop-blur-sm">
+                    <Calendar className="h-5 w-5 text-white" />
+                  </div>
+                  <span className="text-sm font-medium text-blue-100">Booking Hari Ini</span>
+                </div>
+                <div className="text-4xl font-extrabold tracking-tight">{todayBookingsCount}</div>
+              </div>
+            </div>
+
+            {/* Total Booking Aktif - Cyan Gradient */}
+            <div className="relative overflow-hidden rounded-3xl p-6 bg-gradient-to-br from-cyan-400 to-cyan-600 shadow-lg shadow-cyan-500/20 text-white group hover:scale-[1.02] transition-transform duration-300">
+              <div className="absolute right-0 top-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-white/10 blur-2xl"></div>
+              <div className="relative z-10">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2.5 bg-white/20 rounded-xl backdrop-blur-sm">
+                    <Users className="h-5 w-5 text-white" />
+                  </div>
+                  <span className="text-sm font-medium text-cyan-50">Total Booking Aktif</span>
+                </div>
+                <div className="text-4xl font-extrabold tracking-tight">{totalConfirmed}</div>
+              </div>
+            </div>
+
+            {/* Room Stats - Dynamic Gradients */}
+            {roomStats.map((room, index) => {
+              // Define gradients based on index
+              const gradients = [
+                'from-purple-500 to-purple-700 shadow-purple-500/20', // Room 1
+                'from-indigo-500 to-indigo-700 shadow-indigo-500/20', // Room 2
+                'from-sky-400 to-sky-600 shadow-sky-500/20'           // Room 3
+              ];
+              const currentGradient = gradients[index % gradients.length];
+
+              return (
+                <div key={room.value} className={`relative overflow-hidden rounded-3xl p-6 bg-gradient-to-br ${currentGradient} shadow-lg text-white group hover:scale-[1.02] transition-transform duration-300`}>
+                  <div className="absolute right-0 top-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-white/10 blur-2xl"></div>
+                  <div className="absolute bottom-0 right-0 -mb-6 -mr-6 h-32 w-32 rounded-full bg-white/5 blur-3xl"></div>
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="p-2.5 bg-white/20 rounded-xl backdrop-blur-sm">
+                        <BarChart3 className="h-5 w-5 text-white" />
+                      </div>
+                      <span className="text-sm font-medium text-white/90">{room.label}</span>
+                    </div>
+                    <div className="flex items-end gap-2">
+                      <div className="text-4xl font-extrabold tracking-tight">{room.percentage}%</div>
+                      <div className="text-sm font-medium text-white/70 mb-1.5">Terpakai</div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
           {/* Monthly Statistics Chart */}
@@ -466,45 +482,48 @@ const AdminDashboard = () => {
               {/* Search & Filters */}
               <div className="flex-1 lg:max-w-3xl">
                 <div className="space-y-3">
-                  <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-1.5 bg-white border border-slate-200 rounded-2xl shadow-sm">
-                    <div className="md:col-span-5 relative group">
-                      <Search className="absolute left-3 top-2.5 h-5 w-5 text-slate-400 group-focus-within:text-primary-500 transition-colors" />
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 bg-white border border-slate-100 rounded-3xl shadow-sm">
+                    <div className="md:col-span-12 lg:col-span-4 relative group">
+                      <Search className="absolute left-4 top-3.5 h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                       <input
-                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border-0 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all placeholder-slate-400 font-medium outline-none"
+                        className="w-full pl-12 pr-6 py-3 bg-slate-50 border-0 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all placeholder-slate-400 font-medium outline-none"
                         placeholder="Cari nama atau unit..."
                         type="text"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                       />
                     </div>
-                    <div className="md:col-span-3 border-l border-slate-100 pl-2">
+
+                    {/* Date Filters - Integrated into the grid or separate row depending on space? Let's keep them here for now but clearer */}
+                    <div className="md:col-span-12 lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      {/* Room Filter */}
                       <Select value={roomFilter} onValueChange={setRoomFilter}>
-                        <SelectTrigger className="w-full border-0 shadow-none focus:ring-0 px-3 py-2.5 h-auto text-slate-600 font-medium hover:text-slate-900 transition-colors">
+                        <SelectTrigger className="w-full border-0 bg-slate-50 rounded-2xl px-4 py-6 h-auto text-slate-600 font-medium hover:bg-slate-100 transition-colors">
                           <SelectValue placeholder="Semua Ruang" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="rounded-xl border-slate-100 shadow-xl">
                           <SelectItem value="all">Semua Ruang</SelectItem>
                           {ROOMS.map(r => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}
                         </SelectContent>
                       </Select>
-                    </div>
-                    <div className="md:col-span-2 border-l border-slate-100 pl-2">
+
+                      {/* Unit Filter */}
                       <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-                        <SelectTrigger className="w-full border-0 shadow-none focus:ring-0 px-3 py-2.5 h-auto text-slate-600 font-medium hover:text-slate-900 transition-colors">
+                        <SelectTrigger className="w-full border-0 bg-slate-50 rounded-2xl px-4 py-6 h-auto text-slate-600 font-medium hover:bg-slate-100 transition-colors">
                           <SelectValue placeholder="Semua Unit" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="rounded-xl border-slate-100 shadow-xl">
                           <SelectItem value="all">Semua Unit</SelectItem>
                           {DEPARTMENTS.map(d => <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>)}
                         </SelectContent>
                       </Select>
-                    </div>
-                    <div className="md:col-span-2 border-l border-slate-100 pl-2">
+
+                      {/* Status Filter */}
                       <Select value={statusFilter} onValueChange={setStatusFilter}>
-                        <SelectTrigger className="w-full border-0 shadow-none focus:ring-0 px-3 py-2.5 h-auto text-slate-600 font-medium hover:text-slate-900 transition-colors">
+                        <SelectTrigger className="w-full border-0 bg-slate-50 rounded-2xl px-4 py-6 h-auto text-slate-600 font-medium hover:bg-slate-100 transition-colors">
                           <SelectValue placeholder="Semua Status" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="rounded-xl border-slate-100 shadow-xl">
                           <SelectItem value="all">Semua Status</SelectItem>
                           <SelectItem value="confirmed">Aktif</SelectItem>
                           <SelectItem value="completed">Selesai</SelectItem>
@@ -514,10 +533,10 @@ const AdminDashboard = () => {
                     </div>
                   </div>
 
-                  {/* Date Filters */}
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <div className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-2 shadow-sm flex items-center gap-3 group focus-within:ring-2 focus-within:ring-primary-500 transition-all">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider group-focus-within:text-primary-500">Mulai</span>
+                  {/* Date Range - Separate Row for clarity */}
+                  <div className="flex flex-col sm:flex-row gap-4 mt-4">
+                    <div className="flex-1 bg-white border border-slate-100 rounded-2xl px-6 py-3 shadow-sm flex items-center gap-4 group focus-within:ring-2 focus-within:ring-blue-500 transition-all">
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider group-focus-within:text-blue-500">Mulai</span>
                       <input
                         type="date"
                         value={startDate}
@@ -525,8 +544,8 @@ const AdminDashboard = () => {
                         className="w-full bg-transparent border-none text-sm p-0 focus:ring-0 text-slate-700 font-medium"
                       />
                     </div>
-                    <div className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-2 shadow-sm flex items-center gap-3 group focus-within:ring-2 focus-within:ring-primary-500 transition-all">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider group-focus-within:text-primary-500">Sampai</span>
+                    <div className="flex-1 bg-white border border-slate-100 rounded-2xl px-6 py-3 shadow-sm flex items-center gap-4 group focus-within:ring-2 focus-within:ring-blue-500 transition-all">
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider group-focus-within:text-blue-500">Sampai</span>
                       <input
                         type="date"
                         value={endDate}
@@ -551,18 +570,18 @@ const AdminDashboard = () => {
             <CardContent>
               <div className="overflow-x-auto">
                 <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-12">No</TableHead>
-                      <TableHead>Tanggal Booking</TableHead>
-                      <TableHead>Tanggal Penggunaan</TableHead>
-                      <TableHead>Ruang</TableHead>
-                      <TableHead>Nama</TableHead>
-                      <TableHead>Unit Kerja</TableHead>
-                      <TableHead>Jam</TableHead>
-                      <TableHead>Peserta</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="w-12"></TableHead>
+                  <TableHeader className="bg-blue-600 hover:bg-blue-600 border-none">
+                    <TableRow className="hover:bg-blue-600 border-none">
+                      <TableHead className="w-12 text-white font-bold h-12 uppercase first:rounded-tl-2xl pl-6">No</TableHead>
+                      <TableHead className="text-white font-bold h-12 uppercase">Tanggal Booking</TableHead>
+                      <TableHead className="text-white font-bold h-12 uppercase">Tanggal Penggunaan</TableHead>
+                      <TableHead className="text-white font-bold h-12 uppercase">Ruang</TableHead>
+                      <TableHead className="text-white font-bold h-12 uppercase">Nama</TableHead>
+                      <TableHead className="text-white font-bold h-12 uppercase">Unit Kerja</TableHead>
+                      <TableHead className="text-white font-bold h-12 uppercase">Jam</TableHead>
+                      <TableHead className="text-white font-bold h-12 uppercase">Peserta</TableHead>
+                      <TableHead className="text-white font-bold h-12 uppercase">Status</TableHead>
+                      <TableHead className="w-12 text-white font-bold h-12 uppercase last:rounded-tr-2xl"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
