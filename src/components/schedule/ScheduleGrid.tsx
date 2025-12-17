@@ -3,11 +3,10 @@ import { Booking, ROOMS, RoomType, TIME_SLOTS, getRoomLabel } from '@/types/book
 import { formatTime } from '@/lib/dateUtils';
 import { cn } from '@/lib/utils';
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 
 interface ScheduleGridProps {
   bookings: Booking[];
@@ -51,7 +50,7 @@ export const ScheduleGrid = ({ bookings, isLoading }: ScheduleGridProps) => {
   }
 
   return (
-    <TooltipProvider>
+    <>
       <div className="overflow-x-auto pb-4 custom-scrollbar">
         <div className="min-w-max">
           {/* Header Row */}
@@ -90,11 +89,11 @@ export const ScheduleGrid = ({ bookings, isLoading }: ScheduleGridProps) => {
                 const isBooked = !!booking;
 
                 return (
-                  <Tooltip key={time}>
-                    <TooltipTrigger asChild>
+                  <Popover key={time}>
+                    <PopoverTrigger asChild>
                       <div
                         className={cn(
-                          'time-slot flex flex-col items-center justify-center min-h-[56px] rounded-md transition-all duration-200 p-1',
+                          'time-slot flex flex-col items-center justify-center min-h-[56px] rounded-md transition-all duration-200 p-1 cursor-pointer',
                           isBooked
                             ? 'time-slot-booked bg-destructive/15 border border-destructive/20'
                             : 'time-slot-available bg-success/15 border border-success/20 hover:bg-success/25'
@@ -107,9 +106,9 @@ export const ScheduleGrid = ({ bookings, isLoading }: ScheduleGridProps) => {
                           {isBooked ? 'Terisi' : 'Tersedia'}
                         </span>
                       </div>
-                    </TooltipTrigger>
+                    </PopoverTrigger>
                     {isBooked && booking && (
-                      <TooltipContent side="top" className="max-w-xs p-3">
+                      <PopoverContent side="top" className="max-w-xs p-3 w-auto">
                         <div className="space-y-1.5">
                           <p className="font-semibold text-sm">{booking.booker_name}</p>
                           <div className="flex gap-2 text-xs text-muted-foreground">
@@ -123,9 +122,9 @@ export const ScheduleGrid = ({ bookings, isLoading }: ScheduleGridProps) => {
                             <p className="text-xs italic text-muted-foreground border-t pt-1 mt-1">"{booking.notes}"</p>
                           )}
                         </div>
-                      </TooltipContent>
+                      </PopoverContent>
                     )}
-                  </Tooltip>
+                  </Popover>
                 );
               })}
             </div>
@@ -144,6 +143,6 @@ export const ScheduleGrid = ({ bookings, isLoading }: ScheduleGridProps) => {
           <span className="text-sm text-muted-foreground">Terisi</span>
         </div>
       </div>
-    </TooltipProvider>
+    </>
   );
 };
