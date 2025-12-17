@@ -43,7 +43,7 @@ export const DEPARTMENTS: { value: DepartmentType; label: string }[] = [
   { value: 'LAINNYA', label: 'LAINNYA' },
 ];
 
-// Generate times from 08:00 to 16:00 with 15 minute intervals
+// Generate times from 08:00 to 16:00 with 30 minute intervals
 export const TIME_SLOTS: string[] = [];
 const startHour = 8;
 const endHour = 16;
@@ -52,9 +52,7 @@ for (let i = startHour; i <= endHour; i++) {
   const hour = i.toString().padStart(2, '0');
   TIME_SLOTS.push(`${hour}:00`);
   if (i < endHour) {
-    TIME_SLOTS.push(`${hour}:15`);
     TIME_SLOTS.push(`${hour}:30`);
-    TIME_SLOTS.push(`${hour}:45`);
   }
 }
 

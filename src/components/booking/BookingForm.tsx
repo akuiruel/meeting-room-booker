@@ -103,6 +103,28 @@ export const BookingForm = () => {
   const isTomorrowBooking = selectedDate === tomorrowDate;
   const canBookTomorrow = isWindowOpen || !isTomorrowBooking;
 
+  // Filter available times if selected date is today
+  const todayString = getTodayDateString();
+  const isToday = selectedDate === todayString;
+  const now = new Date();
+  const currentHour = now.getHours();
+  const currentMinute = now.getMinutes();
+
+  const isTimePast = (time: string) => {
+    const [hours, minutes] = time.split(':').map(Number);
+    if (hours < currentHour) return true;
+    if (hours === currentHour && minutes <= currentMinute) return true;
+    return false;
+  };
+
+  const availableStartTimes = isToday
+    ? START_TIMES.filter(time => !isTimePast(time))
+    : START_TIMES;
+
+  const availableEndTimes = isToday
+    ? END_TIMES.filter(time => !isTimePast(time))
+    : END_TIMES;
+
   return (
     <>
       <Form {...form}>
@@ -249,11 +271,17 @@ export const BookingForm = () => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {START_TIMES.map((time) => (
-                        <SelectItem key={time} value={time}>
-                          {time}
-                        </SelectItem>
-                      ))}
+                      {availableStartTimes.length > 0 ? (
+                        availableStartTimes.map((time) => (
+                          <SelectItem key={time} value={time}>
+                            {time}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <div className="p-2 text-sm text-muted-foreground text-center">
+                          Tidak ada slot tersedia
+                        </div>
+                      )}
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -278,11 +306,17 @@ export const BookingForm = () => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {END_TIMES.map((time) => (
-                        <SelectItem key={time} value={time}>
-                          {time}
-                        </SelectItem>
-                      ))}
+                      {availableEndTimes.length > 0 ? (
+                        availableEndTimes.map((time) => (
+                          <SelectItem key={time} value={time}>
+                            {time}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <div className="p-2 text-sm text-muted-foreground text-center">
+                          Tidak ada slot tersedia
+                        </div>
+                      )}
                     </SelectContent>
                   </Select>
                   <FormMessage />

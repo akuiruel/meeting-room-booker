@@ -52,15 +52,20 @@ export const ScheduleGrid = ({ bookings, isLoading }: ScheduleGridProps) => {
 
   return (
     <TooltipProvider>
-      <div className="overflow-x-auto">
-        <div className="min-w-[800px]">
+      <div className="overflow-x-auto pb-4 custom-scrollbar">
+        <div className="min-w-max">
           {/* Header Row */}
-          <div className="grid grid-cols-[120px_repeat(8,1fr)] gap-1 mb-2">
-            <div className="p-2 text-sm font-medium text-muted-foreground">Ruang</div>
+          <div
+            className="grid gap-1 mb-2"
+            style={{
+              gridTemplateColumns: `150px repeat(${timeSlots.length}, minmax(80px, 1fr))`
+            }}
+          >
+            <div className="p-2 text-sm font-medium text-muted-foreground sticky left-0 bg-background z-10 shadow-sm border-r">Ruang</div>
             {timeSlots.map((time) => (
               <div
                 key={time}
-                className="p-2 text-center text-sm font-medium text-muted-foreground bg-muted/50 rounded-md"
+                className="p-2 text-center text-sm font-medium text-muted-foreground bg-muted/50 rounded-md whitespace-nowrap"
               >
                 {time}
               </div>
@@ -71,10 +76,13 @@ export const ScheduleGrid = ({ bookings, isLoading }: ScheduleGridProps) => {
           {ROOMS.map((room, roomIndex) => (
             <div
               key={room.value}
-              className="grid grid-cols-[120px_repeat(8,1fr)] gap-1 mb-1"
-              style={{ animationDelay: `${roomIndex * 100}ms` }}
+              className="grid gap-1 mb-1"
+              style={{
+                gridTemplateColumns: `150px repeat(${timeSlots.length}, minmax(80px, 1fr))`,
+                animationDelay: `${roomIndex * 100}ms`
+              }}
             >
-              <div className="p-3 text-sm font-medium bg-card rounded-md border border-border flex items-center">
+              <div className="p-3 text-sm font-medium bg-card rounded-md border border-border flex items-center sticky left-0 z-10 shadow-sm">
                 {room.label}
               </div>
               {timeSlots.map((time) => {
@@ -86,29 +94,34 @@ export const ScheduleGrid = ({ bookings, isLoading }: ScheduleGridProps) => {
                     <TooltipTrigger asChild>
                       <div
                         className={cn(
-                          'time-slot flex items-center justify-center min-h-[56px] rounded-md transition-all duration-200',
+                          'time-slot flex flex-col items-center justify-center min-h-[56px] rounded-md transition-all duration-200 p-1',
                           isBooked
                             ? 'time-slot-booked bg-destructive/15 border border-destructive/20'
                             : 'time-slot-available bg-success/15 border border-success/20 hover:bg-success/25'
                         )}
                       >
                         <span className={cn(
-                          'text-xs font-medium',
+                          'text-xs font-bold block mb-0.5',
                           isBooked ? 'text-destructive' : 'text-success'
                         )}>
-                          {isBooked ? 'Terisi' : 'Tersedia'}
+                          {isBooked ? 'Terisi' : 'Open'}
                         </span>
                       </div>
                     </TooltipTrigger>
                     {isBooked && booking && (
-                      <TooltipContent side="top" className="max-w-xs">
-                        <div className="space-y-1">
-                          <p className="font-medium">{booking.booker_name}</p>
-                          <p className="text-xs text-muted-foreground">{booking.department}</p>
-                          <p className="text-xs">
+                      <TooltipContent side="top" className="max-w-xs p-3">
+                        <div className="space-y-1.5">
+                          <p className="font-semibold text-sm">{booking.booker_name}</p>
+                          <div className="flex gap-2 text-xs text-muted-foreground">
+                            <span className="bg-muted px-1.5 py-0.5 rounded">{booking.department}</span>
+                            <span className="bg-muted px-1.5 py-0.5 rounded">{booking.participant_count} Org</span>
+                          </div>
+                          <p className="text-xs font-mono bg-accent/50 px-2 py-1 rounded mt-1">
                             {formatTime(booking.start_time)} - {formatTime(booking.end_time)}
                           </p>
-                          <p className="text-xs">{booking.participant_count} peserta</p>
+                          {booking.notes && (
+                            <p className="text-xs italic text-muted-foreground border-t pt-1 mt-1">"{booking.notes}"</p>
+                          )}
                         </div>
                       </TooltipContent>
                     )}

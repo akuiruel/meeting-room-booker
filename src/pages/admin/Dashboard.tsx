@@ -1,15 +1,27 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
-import { 
-  Calendar, 
-  Download, 
-  Filter, 
-  Home, 
-  LogOut, 
-  MoreHorizontal, 
-  Search, 
-  Users, 
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
+} from 'recharts';
+import {
+  Calendar,
+  Download,
+  Filter,
+  Home,
+  LogOut,
+  MoreHorizontal,
+  Search,
+  Users,
   X,
   BarChart3,
   FileSpreadsheet,
@@ -60,7 +72,7 @@ const AdminDashboard = () => {
   const { signOut } = useAuth();
   const { data: bookings = [], isLoading } = useAllBookings();
   const cancelBooking = useCancelBooking();
-  
+
   const [searchTerm, setSearchTerm] = useState('');
   const [roomFilter, setRoomFilter] = useState<string>('all');
   const [departmentFilter, setDepartmentFilter] = useState<string>('all');
@@ -68,15 +80,39 @@ const AdminDashboard = () => {
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
 
+  // Helper to determine real-time status
+  const getComputedStatus = (booking: Booking): 'confirmed' | 'cancelled' | 'completed' => {
+    if (booking.status === 'cancelled') return 'cancelled';
+
+    const now = new Date();
+    // Create Date object for booking end time
+    // ISO string format YYYY-MM-DDTHH:mm is standard
+    const bookingEnd = new Date(`${booking.usage_date}T${booking.end_time}`);
+
+    if (now > bookingEnd) return 'completed';
+    return 'confirmed';
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'confirmed': return 'Aktif';
+      case 'cancelled': return 'Dibatalkan';
+      case 'completed': return 'Selesai';
+      default: return status;
+    }
+  };
+
   // Filter bookings
   const filteredBookings = bookings.filter((booking) => {
-    const matchesSearch = 
+    const matchesSearch =
       booking.booker_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       booking.department.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRoom = roomFilter === 'all' || booking.room === roomFilter;
     const matchesDepartment = departmentFilter === 'all' || booking.department === departmentFilter;
-    const matchesStatus = statusFilter === 'all' || booking.status === statusFilter;
-    
+
+    const computedStatus = getComputedStatus(booking);
+    const matchesStatus = statusFilter === 'all' || computedStatus === statusFilter;
+
     return matchesSearch && matchesRoom && matchesDepartment && matchesStatus;
   });
 
@@ -84,16 +120,41 @@ const AdminDashboard = () => {
   const todayBookings = bookings.filter(
     (b) => b.usage_date === getTodayDateString() && b.status === 'confirmed'
   ).length;
-  
+
   const totalConfirmed = bookings.filter((b) => b.status === 'confirmed').length;
-  
+
   const roomStats = ROOMS.map((room) => ({
     ...room,
     count: bookings.filter((b) => b.room === room.value && b.status === 'confirmed').length,
-    percentage: totalConfirmed > 0 
+    percentage: totalConfirmed > 0
       ? Math.round((bookings.filter((b) => b.room === room.value && b.status === 'confirmed').length / totalConfirmed) * 100)
       : 0,
   }));
+
+  // Chart Data Grouped by Month
+  const monthlyData = useMemo(() => {
+    const data: Record<string, any> = {};
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    bookings.forEach(booking => {
+      if (booking.status === 'confirmed') {
+        const date = new Date(booking.usage_date);
+        const monthKey = `${months[date.getMonth()]} ${date.getFullYear()}`;
+
+        if (!data[monthKey]) {
+          data[monthKey] = { name: monthKey };
+          ROOMS.forEach(r => data[monthKey][r.value] = 0);
+        }
+
+        data[monthKey][booking.room] = (data[monthKey][booking.room] || 0) + 1;
+      }
+    });
+
+    // Convert to array and take last 6 months or entries
+    return Object.values(data).sort((a: any, b: any) => {
+      return new Date(a.name).getTime() - new Date(b.name).getTime();
+    }).slice(-6); // Last 6 months
+  }, [bookings]);
 
   const handleCancelBooking = async () => {
     if (selectedBooking) {
@@ -105,17 +166,20 @@ const AdminDashboard = () => {
 
   const exportToCSV = () => {
     const headers = ['No', 'Tanggal Booking', 'Tanggal Penggunaan', 'Ruang', 'Nama', 'Unit Kerja', 'Jam', 'Peserta', 'Status'];
-    const rows = filteredBookings.map((booking, index) => [
-      index + 1,
-      formatDate(booking.booking_date, 'dd/MM/yyyy HH:mm'),
-      formatDate(booking.usage_date),
-      getRoomLabel(booking.room),
-      booking.booker_name,
-      booking.department,
-      `${formatTime(booking.start_time)} - ${formatTime(booking.end_time)}`,
-      booking.participant_count,
-      booking.status === 'confirmed' ? 'Aktif' : 'Dibatalkan',
-    ]);
+    const rows = filteredBookings.map((booking, index) => {
+      const status = getComputedStatus(booking);
+      return [
+        index + 1,
+        formatDate(booking.booking_date, 'dd/MM/yyyy HH:mm'),
+        formatDate(booking.usage_date),
+        getRoomLabel(booking.room),
+        booking.booker_name,
+        booking.department,
+        `${formatTime(booking.start_time)} - ${formatTime(booking.end_time)}`,
+        booking.participant_count,
+        getStatusLabel(status),
+      ];
+    });
 
     const csvContent = [
       headers.join(','),
@@ -127,6 +191,43 @@ const AdminDashboard = () => {
     link.href = URL.createObjectURL(blob);
     link.download = `bookings-${format(new Date(), 'yyyy-MM-dd')}.csv`;
     link.click();
+  };
+
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+
+    // Add title
+    doc.setFontSize(18);
+    doc.text('Laporan Booking Ruang Diskusi', 14, 22);
+
+    doc.setFontSize(11);
+    doc.setTextColor(100);
+    doc.text(`Tanggal Cetak: ${format(new Date(), 'dd MMMM yyyy HH:mm')}`, 14, 30);
+
+    // Table content
+    const tableColumn = ["No", "Tanggal", "Ruang", "Nama", "Unit", "Jam", "Status"];
+    const tableRows = filteredBookings.map((booking, index) => {
+      const status = getComputedStatus(booking);
+      return [
+        index + 1,
+        formatDate(booking.usage_date),
+        getRoomLabel(booking.room),
+        booking.booker_name,
+        booking.department,
+        `${formatTime(booking.start_time)} - ${formatTime(booking.end_time)}`,
+        getStatusLabel(status),
+      ];
+    });
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 40,
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [66, 66, 66] },
+    });
+
+    doc.save(`booking-report-${format(new Date(), 'yyyy-MM-dd')}.pdf`);
   };
 
   return (
@@ -173,10 +274,31 @@ const AdminDashboard = () => {
               <p className="text-muted-foreground">Kelola semua booking ruang diskusi</p>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" onClick={exportToCSV} className="gap-2">
+              <Button variant="outline" onClick={exportToPDF} className="gap-2 hidden sm:flex">
+                <FileText className="h-4 w-4" />
+                Export PDF
+              </Button>
+              <Button variant="outline" onClick={exportToCSV} className="gap-2 hidden sm:flex">
                 <FileSpreadsheet className="h-4 w-4" />
                 Export CSV
               </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="sm:hidden">
+                    <Download className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={exportToPDF}>
+                    <FileText className="h-4 w-4 mr-2" />
+                    Export PDF
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={exportToCSV}>
+                    <FileSpreadsheet className="h-4 w-4 mr-2" />
+                    Export CSV
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Button variant="ghost" className="lg:hidden" onClick={signOut}>
                 <LogOut className="h-4 w-4" />
               </Button>
@@ -222,6 +344,36 @@ const AdminDashboard = () => {
               </Card>
             ))}
           </div>
+
+          {/* Monthly Statistics Chart */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>Statistik Penggunaan Bulanan</CardTitle>
+              <CardDescription>Grafik penggunaan ruang diskusi per bulan</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={monthlyData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis allowDecimals={false} />
+                    <Tooltip />
+                    <Legend />
+                    {ROOMS.map((room, index) => (
+                      <Bar
+                        key={room.value}
+                        dataKey={room.value}
+                        name={room.label}
+                        fill={index === 0 ? '#3b82f6' : index === 1 ? '#06b6d4' : '#8b5cf6'}
+                        radius={[4, 4, 0, 0]}
+                      />
+                    ))}
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Filters */}
           <Card className="mb-6">
@@ -275,6 +427,7 @@ const AdminDashboard = () => {
                   <SelectContent>
                     <SelectItem value="all">Semua</SelectItem>
                     <SelectItem value="confirmed">Aktif</SelectItem>
+                    <SelectItem value="completed">Selesai</SelectItem>
                     <SelectItem value="cancelled">Dibatalkan</SelectItem>
                   </SelectContent>
                 </Select>
@@ -324,59 +477,67 @@ const AdminDashboard = () => {
                         </TableCell>
                       </TableRow>
                     ) : (
-                      filteredBookings.map((booking, index) => (
-                        <TableRow key={booking.id}>
-                          <TableCell className="font-medium">{index + 1}</TableCell>
-                          <TableCell className="text-sm">
-                            {formatDate(booking.booking_date, 'dd/MM/yyyy HH:mm')}
-                          </TableCell>
-                          <TableCell>{formatDate(booking.usage_date)}</TableCell>
-                          <TableCell>{getRoomLabel(booking.room)}</TableCell>
-                          <TableCell className="font-medium">{booking.booker_name}</TableCell>
-                          <TableCell>
-                            <Badge variant="outline">{booking.department}</Badge>
-                          </TableCell>
-                          <TableCell>
-                            {formatTime(booking.start_time)} - {formatTime(booking.end_time)}
-                          </TableCell>
-                          <TableCell>{booking.participant_count}</TableCell>
-                          <TableCell>
-                            <Badge
-                              variant={booking.status === 'confirmed' ? 'default' : 'secondary'}
-                              className={
-                                booking.status === 'confirmed'
-                                  ? 'bg-success/10 text-success border-success/20'
-                                  : 'bg-muted text-muted-foreground'
-                              }
-                            >
-                              {booking.status === 'confirmed' ? 'Aktif' : 'Dibatalkan'}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            {booking.status === 'confirmed' && (
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                                    <MoreHorizontal className="h-4 w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem
-                                    onClick={() => {
-                                      setSelectedBooking(booking);
-                                      setCancelDialogOpen(true);
-                                    }}
-                                    className="text-destructive"
-                                  >
-                                    <X className="h-4 w-4 mr-2" />
-                                    Batalkan
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      ))
+                      filteredBookings.map((booking, index) => {
+                        const status = getComputedStatus(booking);
+                        return (
+                          <TableRow key={booking.id}>
+                            <TableCell className="font-medium">{index + 1}</TableCell>
+                            <TableCell className="text-sm">
+                              {formatDate(booking.booking_date, 'dd/MM/yyyy HH:mm')}
+                            </TableCell>
+                            <TableCell>{formatDate(booking.usage_date)}</TableCell>
+                            <TableCell>{getRoomLabel(booking.room)}</TableCell>
+                            <TableCell className="font-medium">{booking.booker_name}</TableCell>
+                            <TableCell>
+                              <Badge variant="outline">{booking.department}</Badge>
+                            </TableCell>
+                            <TableCell>
+                              {formatTime(booking.start_time)} - {formatTime(booking.end_time)}
+                            </TableCell>
+                            <TableCell>{booking.participant_count}</TableCell>
+                            <TableCell>
+                              <Badge
+                                variant={
+                                  status === 'confirmed' ? 'default' :
+                                    status === 'completed' ? 'outline' : 'secondary'
+                                }
+                                className={
+                                  status === 'confirmed'
+                                    ? 'bg-success/10 text-success border-success/20'
+                                    : status === 'completed'
+                                      ? 'bg-blue-50 text-blue-700 border-blue-200'
+                                      : 'bg-muted text-muted-foreground'
+                                }
+                              >
+                                {getStatusLabel(status)}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              {status === 'confirmed' && (
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                                      <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem
+                                      onClick={() => {
+                                        setSelectedBooking(booking);
+                                        setCancelDialogOpen(true);
+                                      }}
+                                      className="text-destructive"
+                                    >
+                                      <X className="h-4 w-4 mr-2" />
+                                      Batalkan
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })
                     )}
                   </TableBody>
                 </Table>
