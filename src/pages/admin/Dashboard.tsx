@@ -456,36 +456,39 @@ const AdminDashboard = () => {
                       />
                     </div>
                     <div className="md:col-span-3 border-l border-slate-100 pl-2">
-                      <select
-                        className="w-full px-3 py-2.5 bg-transparent border-0 text-sm font-medium text-slate-600 focus:ring-0 cursor-pointer hover:text-slate-900 transition-colors"
-                        value={roomFilter}
-                        onChange={(e) => setRoomFilter(e.target.value)}
-                      >
-                        <option value="all">Semua Ruang</option>
-                        {ROOMS.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
-                      </select>
+                      <Select value={roomFilter} onValueChange={setRoomFilter}>
+                        <SelectTrigger className="w-full border-0 shadow-none focus:ring-0 px-3 py-2.5 h-auto text-slate-600 font-medium hover:text-slate-900 transition-colors">
+                          <SelectValue placeholder="Semua Ruang" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Semua Ruang</SelectItem>
+                          {ROOMS.map(r => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div className="md:col-span-2 border-l border-slate-100 pl-2">
-                      <select
-                        className="w-full px-3 py-2.5 bg-transparent border-0 text-sm font-medium text-slate-600 focus:ring-0 cursor-pointer hover:text-slate-900 transition-colors"
-                        value={departmentFilter}
-                        onChange={(e) => setDepartmentFilter(e.target.value)}
-                      >
-                        <option value="all">Semua Unit</option>
-                        {DEPARTMENTS.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
-                      </select>
+                      <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+                        <SelectTrigger className="w-full border-0 shadow-none focus:ring-0 px-3 py-2.5 h-auto text-slate-600 font-medium hover:text-slate-900 transition-colors">
+                          <SelectValue placeholder="Semua Unit" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Semua Unit</SelectItem>
+                          {DEPARTMENTS.map(d => <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div className="md:col-span-2 border-l border-slate-100 pl-2">
-                      <select
-                        className="w-full px-3 py-2.5 bg-transparent border-0 text-sm font-medium text-slate-600 focus:ring-0 cursor-pointer hover:text-slate-900 transition-colors"
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
-                      >
-                        <option value="all">Semua Status</option>
-                        <option value="confirmed">Aktif</option>
-                        <option value="completed">Selesai</option>
-                        <option value="cancelled">Dibatalkan</option>
-                      </select>
+                      <Select value={statusFilter} onValueChange={setStatusFilter}>
+                        <SelectTrigger className="w-full border-0 shadow-none focus:ring-0 px-3 py-2.5 h-auto text-slate-600 font-medium hover:text-slate-900 transition-colors">
+                          <SelectValue placeholder="Semua Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Semua Status</SelectItem>
+                          <SelectItem value="confirmed">Aktif</SelectItem>
+                          <SelectItem value="completed">Selesai</SelectItem>
+                          <SelectItem value="cancelled">Dibatalkan</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
 
