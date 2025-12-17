@@ -77,19 +77,16 @@ const AdminDashboard = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [roomFilter, setRoomFilter] = useState<string>('all');
   const [departmentFilter, setDepartmentFilter] = useState<string>('all');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
 
   // Helper to determine real-time status
   const getComputedStatus = (booking: Booking): 'confirmed' | 'cancelled' | 'completed' => {
     if (booking.status === 'cancelled') return 'cancelled';
-
     const now = new Date();
-    // Create Date object for booking end time
-    // ISO string format YYYY-MM-DDTHH:mm is standard
     const bookingEnd = new Date(`${booking.usage_date}T${booking.end_time}`);
-
     if (now > bookingEnd) return 'completed';
     return 'confirmed';
   };
@@ -110,15 +107,26 @@ const AdminDashboard = () => {
       booking.department.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRoom = roomFilter === 'all' || booking.room === roomFilter;
     const matchesDepartment = departmentFilter === 'all' || booking.department === departmentFilter;
-
     const computedStatus = getComputedStatus(booking);
     const matchesStatus = statusFilter === 'all' || computedStatus === statusFilter;
 
-    return matchesSearch && matchesRoom && matchesDepartment && matchesStatus;
+    // Date Range Filter
+    let matchesDate = true;
+    if (startDate) {
+      matchesDate = matchesDate && booking.usage_date >= startDate;
+    }
+    if (endDate) {
+      matchesDate = matchesDate && booking.usage_date <= endDate;
+    }
+
+    return matchesSearch && matchesRoom && matchesDepartment && matchesStatus && matchesDate;
   });
 
-  // Statistics
-  const todayBookings = bookings.filter(
+  // Statistics (tetap global, tidak terpengaruh filter tanggal untuk gambaran umum, atau mau ikut filter? 
+  // Biasanya overview dashboard itu hari ini/global. Kita biarkan global dulu untuk stats cards, 
+  // tapi export mengikuti filteredBookings).
+
+  const todayBookingsCount = bookings.filter(
     (b) => b.usage_date === getTodayDateString() && b.status === 'confirmed'
   ).length;
 
@@ -132,26 +140,21 @@ const AdminDashboard = () => {
       : 0,
   }));
 
-  // Chart Data Grouped by Month
+  // Chart Data (ikut filtered atau global? Biasanya global untuk overview. Kita biarkan global)
   const monthlyData = useMemo(() => {
     const data: Record<string, any> = {};
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
     bookings.forEach(booking => {
       if (booking.status === 'confirmed') {
         const date = new Date(booking.usage_date);
         const monthKey = `${months[date.getMonth()]} ${date.getFullYear()}`;
-
         if (!data[monthKey]) {
           data[monthKey] = { name: monthKey };
           ROOMS.forEach(r => data[monthKey][r.value] = 0);
         }
-
         data[monthKey][booking.room] = (data[monthKey][booking.room] || 0) + 1;
       }
     });
-
-    // Convert to array and take last 6 months or entries
     return Object.values(data).sort((a: any, b: any) => {
       return new Date(a.name).getTime() - new Date(b.name).getTime();
     }).slice(-6); // Last 6 months
@@ -166,7 +169,7 @@ const AdminDashboard = () => {
   };
 
   const exportToCSV = () => {
-    const headers = ['No', 'Tanggal Booking', 'Tanggal Penggunaan', 'Ruang', 'Nama', 'Unit Kerja', 'Jam', 'Peserta', 'Status'];
+    const headers = ['No', 'Tanggal Booking', 'Tanggal Penggunaan', 'Ruang', 'Nama', 'Unit Kerja', 'Jam', 'Peserta', 'Status', 'Catatan'];
     const rows = filteredBookings.map((booking, index) => {
       const status = getComputedStatus(booking);
       return [
@@ -179,33 +182,37 @@ const AdminDashboard = () => {
         `${formatTime(booking.start_time)} - ${formatTime(booking.end_time)}`,
         booking.participant_count,
         getStatusLabel(status),
+        booking.notes || '-'
       ];
     });
-
-    const csvContent = [
-      headers.join(','),
-      ...rows.map((row) => row.map((cell) => `"${cell}"`).join(',')),
-    ].join('\n');
-
+    const csvContent = [headers.join(','), ...rows.map((row) => row.map((cell) => `"${cell}"`).join(','))].join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `bookings-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+    link.download = `bookings-${startDate || 'all'}-to-${endDate || 'all'}.csv`;
     link.click();
   };
 
   const exportToPDF = () => {
     const doc = new jsPDF();
 
-    // Add title
-    doc.setFontSize(18);
-    doc.text('Laporan Booking Ruang Diskusi', 14, 22);
+    // Header Report
+    doc.setFillColor(59, 130, 246); // Primary Blue
+    doc.rect(0, 0, 210, 40, 'F');
 
-    doc.setFontSize(11);
-    doc.setTextColor(100);
-    doc.text(`Tanggal Cetak: ${format(new Date(), 'dd MMMM yyyy HH:mm')}`, 14, 30);
+    doc.setFontSize(22);
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.text('RuangBook Report', 14, 20);
 
-    // Table content
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    const periodeInfo = startDate && endDate
+      ? `Periode: ${formatDate(startDate)} - ${formatDate(endDate)}`
+      : 'Periode: Semua Data';
+    doc.text(periodeInfo, 14, 30);
+    doc.text(`Tanggal Cetak: ${format(new Date(), 'dd MMMM yyyy HH:mm')}`, 14, 35);
+
     const tableColumn = ["No", "Tanggal", "Ruang", "Nama", "Unit", "Jam", "Status"];
     const tableRows = filteredBookings.map((booking, index) => {
       const status = getComputedStatus(booking);
@@ -223,12 +230,44 @@ const AdminDashboard = () => {
     autoTable(doc, {
       head: [tableColumn],
       body: tableRows,
-      startY: 40,
-      styles: { fontSize: 8 },
-      headStyles: { fillColor: [66, 66, 66] },
+      startY: 45,
+      theme: 'grid',
+      headStyles: {
+        fillColor: [59, 130, 246], // Blue header
+        textColor: [255, 255, 255],
+        fontStyle: 'bold',
+        halign: 'center'
+      },
+      styles: {
+        fontSize: 9,
+        cellPadding: 3,
+        overflow: 'linebreak'
+      },
+      columnStyles: {
+        0: { halign: 'center', cellWidth: 15 }, // No
+        1: { cellWidth: 30 }, // Tanggal
+        2: { cellWidth: 30 }, // Ruang
+        5: { halign: 'center' }, // Jam
+        6: { halign: 'center', fontStyle: 'bold' }  // Status
+      },
+      didParseCell: function (data) {
+        if (data.section === 'body' && data.column.index === 6) {
+          const status = data.cell.raw;
+          if (status === 'Aktif') {
+            data.cell.styles.textColor = [16, 185, 129]; // Emerald Green
+          } else if (status === 'Selesai') {
+            data.cell.styles.textColor = [59, 130, 246]; // Blue
+          } else if (status === 'Dibatalkan') {
+            data.cell.styles.textColor = [239, 68, 68]; // Red
+          }
+        }
+      },
+      alternateRowStyles: {
+        fillColor: [241, 245, 249] // Slate 50
+      }
     });
 
-    doc.save(`booking-report-${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+    doc.save(`booking-report-${startDate || 'all'}-to-${endDate || 'all'}.pdf`);
   };
 
   return (
@@ -401,53 +440,76 @@ const AdminDashboard = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Cari nama atau unit kerja..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-9"
-                  />
+              {/* Search & Filters */}
+              <div className="flex-1 lg:max-w-3xl">
+                <div className="space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-1.5 bg-white border border-slate-200 rounded-2xl shadow-sm">
+                    <div className="md:col-span-5 relative group">
+                      <Search className="absolute left-3 top-2.5 h-5 w-5 text-slate-400 group-focus-within:text-primary-500 transition-colors" />
+                      <input
+                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border-0 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all placeholder-slate-400 font-medium outline-none"
+                        placeholder="Cari nama atau unit..."
+                        type="text"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                      />
+                    </div>
+                    <div className="md:col-span-3 border-l border-slate-100 pl-2">
+                      <select
+                        className="w-full px-3 py-2.5 bg-transparent border-0 text-sm font-medium text-slate-600 focus:ring-0 cursor-pointer hover:text-slate-900 transition-colors"
+                        value={roomFilter}
+                        onChange={(e) => setRoomFilter(e.target.value)}
+                      >
+                        <option value="all">Semua Ruang</option>
+                        {ROOMS.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
+                      </select>
+                    </div>
+                    <div className="md:col-span-2 border-l border-slate-100 pl-2">
+                      <select
+                        className="w-full px-3 py-2.5 bg-transparent border-0 text-sm font-medium text-slate-600 focus:ring-0 cursor-pointer hover:text-slate-900 transition-colors"
+                        value={departmentFilter}
+                        onChange={(e) => setDepartmentFilter(e.target.value)}
+                      >
+                        <option value="all">Semua Unit</option>
+                        {DEPARTMENTS.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
+                      </select>
+                    </div>
+                    <div className="md:col-span-2 border-l border-slate-100 pl-2">
+                      <select
+                        className="w-full px-3 py-2.5 bg-transparent border-0 text-sm font-medium text-slate-600 focus:ring-0 cursor-pointer hover:text-slate-900 transition-colors"
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                      >
+                        <option value="all">Semua Status</option>
+                        <option value="confirmed">Aktif</option>
+                        <option value="completed">Selesai</option>
+                        <option value="cancelled">Dibatalkan</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Date Filters */}
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <div className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-2 shadow-sm flex items-center gap-3 group focus-within:ring-2 focus-within:ring-primary-500 transition-all">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider group-focus-within:text-primary-500">Mulai</span>
+                      <input
+                        type="date"
+                        value={startDate}
+                        onChange={e => setStartDate(e.target.value)}
+                        className="w-full bg-transparent border-none text-sm p-0 focus:ring-0 text-slate-700 font-medium"
+                      />
+                    </div>
+                    <div className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-2 shadow-sm flex items-center gap-3 group focus-within:ring-2 focus-within:ring-primary-500 transition-all">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider group-focus-within:text-primary-500">Sampai</span>
+                      <input
+                        type="date"
+                        value={endDate}
+                        onChange={e => setEndDate(e.target.value)}
+                        className="w-full bg-transparent border-none text-sm p-0 focus:ring-0 text-slate-700 font-medium"
+                      />
+                    </div>
+                  </div>
                 </div>
-                <Select value={roomFilter} onValueChange={setRoomFilter}>
-                  <SelectTrigger className="w-full sm:w-[180px]">
-                    <SelectValue placeholder="Semua Ruang" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Semua Ruang</SelectItem>
-                    {ROOMS.map((room) => (
-                      <SelectItem key={room.value} value={room.value}>
-                        {room.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-                  <SelectTrigger className="w-full sm:w-[180px]">
-                    <SelectValue placeholder="Semua Unit" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Semua Unit</SelectItem>
-                    {DEPARTMENTS.map((dept) => (
-                      <SelectItem key={dept.value} value={dept.value}>
-                        {dept.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-full sm:w-[140px]">
-                    <SelectValue placeholder="Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Semua</SelectItem>
-                    <SelectItem value="confirmed">Aktif</SelectItem>
-                    <SelectItem value="completed">Selesai</SelectItem>
-                    <SelectItem value="cancelled">Dibatalkan</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
             </CardContent>
           </Card>
