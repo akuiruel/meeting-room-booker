@@ -96,7 +96,7 @@ const Index = () => {
                     <span className="material-symbols-outlined text-3xl">schedule</span>
                   </div>
                   <div>
-                    <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-1">08-16</h3>
+                    <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-1">08.00 - 16.00</h3>
                     <p className="text-sm font-medium text-slate-500">Jam Operasional</p>
                   </div>
                 </div>
@@ -132,8 +132,8 @@ const Index = () => {
               <button
                 onClick={() => setActiveTab('today')}
                 className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'today'
-                    ? 'bg-white dark:bg-surface-dark shadow-sm text-primary dark:text-white border border-slate-200 dark:border-slate-700'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                  ? 'bg-white dark:bg-surface-dark shadow-sm text-primary dark:text-white border border-slate-200 dark:border-slate-700'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                   }`}
               >
                 Hari Ini
@@ -141,8 +141,8 @@ const Index = () => {
               <button
                 onClick={() => setActiveTab('tomorrow')}
                 className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'tomorrow'
-                    ? 'bg-white dark:bg-surface-dark shadow-sm text-primary dark:text-white border border-slate-200 dark:border-slate-700'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                  ? 'bg-white dark:bg-surface-dark shadow-sm text-primary dark:text-white border border-slate-200 dark:border-slate-700'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                   }`}
               >
                 Besok
