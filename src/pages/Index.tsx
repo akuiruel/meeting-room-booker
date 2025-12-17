@@ -37,9 +37,9 @@ const Index = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              <Link to="/admin/auth" className="hidden sm:flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 hover:shadow-md transition-all">
+              <Link to="/admin/auth" className="flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 hover:shadow-md transition-all">
                 <Settings className="h-5 w-5" />
-                Admin
+                <span className="hidden sm:inline">Admin</span>
               </Link>
             </div>
           </div>
@@ -132,8 +132,8 @@ const Index = () => {
               <button
                 onClick={() => setActiveTab('today')}
                 className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'today'
-                    ? 'bg-white dark:bg-surface-dark shadow-sm text-primary dark:text-white border border-slate-200 dark:border-slate-700'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                  ? 'bg-white dark:bg-surface-dark shadow-sm text-primary dark:text-white border border-slate-200 dark:border-slate-700'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                   }`}
               >
                 Hari Ini
@@ -141,8 +141,8 @@ const Index = () => {
               <button
                 onClick={() => setActiveTab('tomorrow')}
                 className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'tomorrow'
-                    ? 'bg-white dark:bg-surface-dark shadow-sm text-primary dark:text-white border border-slate-200 dark:border-slate-700'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                  ? 'bg-white dark:bg-surface-dark shadow-sm text-primary dark:text-white border border-slate-200 dark:border-slate-700'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                   }`}
               >
                 Besok
@@ -180,7 +180,7 @@ const Index = () => {
           </div>
 
           {/* Tips Sidebar */}
-          <div className="hidden lg:flex lg:w-2/5 bg-gradient-to-br from-blue-600 to-indigo-700 p-12 text-white flex-col justify-between relative overflow-hidden">
+          <div className="flex w-full lg:w-2/5 bg-gradient-to-br from-blue-600 to-indigo-700 p-12 text-white flex-col justify-between relative overflow-hidden">
             <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
             <div className="absolute -right-20 -top-20 w-80 h-80 bg-blue-400/30 rounded-full blur-3xl"></div>
             <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-purple-500/30 rounded-full blur-3xl"></div>
