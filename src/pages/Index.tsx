@@ -1,138 +1,261 @@
-import { useState } from 'react';
-import { Calendar, Users, Clock, ArrowRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Calendar, Users, Clock, ArrowRight, Settings, Moon, Sun, CheckCircle, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Layout } from '@/components/layout/Layout';
 import { ScheduleGrid } from '@/components/schedule/ScheduleGrid';
 import { CountdownTimer } from '@/components/schedule/CountdownTimer';
 import { BookingForm } from '@/components/booking/BookingForm';
 import { useTodayBookings, useTomorrowBookings } from '@/hooks/useBookings';
 import { useRealtimeBookings } from '@/hooks/useRealtimeBookings';
 import { formatDate, getToday, getTomorrow, isBookingWindowOpen } from '@/lib/dateUtils';
+import { Link } from 'react-router-dom';
 
 const Index = () => {
-  const [activeTab, setActiveTab] = useState('today');
+  const [activeTab, setActiveTab] = useState<'today' | 'tomorrow'>('today');
   const { data: todayBookings = [], isLoading: todayLoading } = useTodayBookings();
   const { data: tomorrowBookings = [], isLoading: tomorrowLoading } = useTomorrowBookings();
-  
+
   useRealtimeBookings();
 
+  // Dark mode toggle
+  const toggleDarkMode = () => {
+    document.documentElement.classList.toggle('dark');
+  };
+
   return (
-    <Layout>
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-accent/10 py-16 lg:py-24">
-        <div className="container">
-          <div className="max-w-3xl mx-auto text-center animate-fade-in">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
-              <Calendar className="h-4 w-4" />
-              Sistem Booking Ruang Diskusi
+    <div className="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-100 font-display transition-colors duration-300 antialiased selection:bg-primary selection:text-white min-h-screen">
+
+      {/* Navbar */}
+      <nav className="sticky top-0 z-50 w-full bg-white/90 dark:bg-background-dark/90 backdrop-blur-xl border-b border-border-light dark:border-border-dark">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-gradient-to-tr from-primary to-secondary rounded-xl flex items-center justify-center text-white shadow-glow transform transition-transform hover:scale-105">
+                <span className="material-symbols-outlined text-2xl font-bold">calendar_month</span>
+              </div>
+              <div>
+                <span className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white block leading-none">RuangBook</span>
+                <span className="text-xs font-semibold text-primary uppercase tracking-wider">Dashboard</span>
+              </div>
             </div>
-            <h1 className="text-4xl lg:text-5xl font-bold mb-6 tracking-tight">
-              Booking Ruang Diskusi
-              <span className="block gradient-text">Lebih Mudah & Cepat</span>
-            </h1>
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              <Button size="lg" className="gap-2" onClick={() => document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth' })}>
-                Booking Sekarang
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-              <Button size="lg" variant="outline" onClick={() => document.getElementById('schedule')?.scrollIntoView({ behavior: 'smooth' })}>
-                Lihat Jadwal
-              </Button>
+
+            <div className="hidden md:flex items-center space-x-1 bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark p-1.5 rounded-2xl shadow-sm">
+              <a href="#" className="px-6 py-2.5 text-sm font-bold text-white bg-primary rounded-xl shadow-md transition-all transform hover:scale-[1.02]">Beranda</a>
+              <a href="#jadwal" className="px-6 py-2.5 text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-all">Jadwal</a>
+              <a href="#history" className="px-6 py-2.5 text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-all">Riwayat</a>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
+                onClick={toggleDarkMode}
+              >
+                <Moon className="h-5 w-5 dark:hidden" />
+                <Sun className="h-5 w-5 hidden dark:block text-yellow-400" />
+              </button>
+              <Link to="/admin/auth" className="hidden sm:flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 hover:shadow-md transition-all">
+                <Settings className="h-5 w-5" />
+                Admin
+              </Link>
             </div>
           </div>
         </div>
-        
-        {/* Decorative elements */}
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
-      </section>
+      </nav>
 
-      {/* Features */}
-      <section className="py-12 border-b border-border">
-        <div className="container">
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { icon: Calendar, title: '3 Ruang Tersedia', desc: 'Ruang Diskusi 1, 2, dan 3 siap digunakan' },
-              { icon: Clock, title: 'Jam 08:00 - 16:00', desc: 'Tersedia setiap hari kerja' },
-              { icon: Users, title: 'Maks 15 Peserta', desc: 'Kapasitas fleksibel per ruang' },
-            ].map((item, i) => (
-              <Card key={i} className="border-0 bg-muted/50 animate-slide-up" style={{ animationDelay: `${i * 100}ms` }}>
-                <CardContent className="flex items-center gap-4 p-6">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                    <item.icon className="h-6 w-6 text-primary" />
+      {/* Hero Section */}
+      <section className="relative pt-20 pb-32 overflow-hidden">
+        <div className="absolute inset-0 z-0 bg-grid-pattern opacity-[0.03] dark:opacity-[0.05]"></div>
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-blue-100/50 to-transparent dark:from-blue-900/10 pointer-events-none"></div>
+        <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-primary/20 rounded-full blur-[100px] pointer-events-none"></div>
+        <div className="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-purple-400/20 rounded-full blur-[80px] pointer-events-none"></div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="text-left animate-fade-in">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100/50 dark:bg-blue-900/30 text-primary dark:text-blue-300 text-sm font-bold mb-8 border border-blue-200 dark:border-blue-800 backdrop-blur-sm shadow-sm">
+                <span className="material-symbols-outlined text-lg filled">bolt</span>
+                Sistem Booking Cepat & Instan
+              </div>
+              <h1 className="text-5xl lg:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-6 leading-[1.1]">
+                Booking Ruang <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-500">Tanpa Ribet.</span>
+              </h1>
+              <p className="text-lg text-slate-600 dark:text-slate-400 mb-10 max-w-lg leading-relaxed">
+                Platform manajemen ruang diskusi modern untuk tim Anda. Cek ketersediaan real-time dan amankan ruangan meeting hanya dengan beberapa klik.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center gap-4">
+                <a href="#form-booking" className="w-full sm:w-auto px-8 py-4 bg-primary hover:bg-primary-dark text-white font-bold rounded-2xl shadow-lg shadow-blue-500/30 transition-all flex items-center justify-center gap-3 group transform hover:-translate-y-1">
+                  <span>Mulai Booking</span>
+                  <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </a>
+                <a href="#jadwal" className="w-full sm:w-auto px-8 py-4 bg-white dark:bg-surface-dark text-slate-700 dark:text-slate-200 border border-border-light dark:border-border-dark font-bold rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                  <span className="material-symbols-outlined text-primary">calendar_month</span>
+                  Cek Jadwal
+                </a>
+              </div>
+            </div>
+
+            <div className="relative animate-slide-up">
+              <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/10 to-purple-500/10 rounded-[3rem] transform rotate-3 scale-95 blur-xl"></div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 relative">
+                <div className="bg-white/80 dark:bg-surface-dark/80 backdrop-blur-md p-6 rounded-3xl border border-white/20 shadow-soft flex flex-col items-start gap-4 transform hover:-translate-y-1 transition-transform duration-300">
+                  <div className="w-14 h-14 rounded-2xl bg-blue-100 dark:bg-blue-900/40 text-primary flex items-center justify-center">
+                    <span className="material-symbols-outlined text-3xl">meeting_room</span>
                   </div>
                   <div>
-                    <h3 className="font-semibold">{item.title}</h3>
-                    <p className="text-sm text-muted-foreground">{item.desc}</p>
+                    <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-1">3</h3>
+                    <p className="text-sm font-medium text-slate-500">Ruangan Aktif</p>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+                </div>
+                <div className="bg-white/80 dark:bg-surface-dark/80 backdrop-blur-md p-6 rounded-3xl border border-white/20 shadow-soft flex flex-col items-start gap-4 transform hover:-translate-y-1 transition-transform duration-300 sm:translate-y-8">
+                  <div className="w-14 h-14 rounded-2xl bg-purple-100 dark:bg-purple-900/40 text-purple-600 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-3xl">schedule</span>
+                  </div>
+                  <div>
+                    <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-1">08-16</h3>
+                    <p className="text-sm font-medium text-slate-500">Jam Operasional</p>
+                  </div>
+                </div>
+                <div className="bg-white/80 dark:bg-surface-dark/80 backdrop-blur-md p-6 rounded-3xl border border-white/20 shadow-soft flex flex-col items-start gap-4 transform hover:-translate-y-1 transition-transform duration-300">
+                  <div className="w-14 h-14 rounded-2xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-3xl">groups</span>
+                  </div>
+                  <div>
+                    <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-1">15+</h3>
+                    <p className="text-sm font-medium text-slate-500">Kapasitas Orang</p>
+                  </div>
+                </div>
+                <div className="bg-gradient-to-br from-primary to-blue-600 text-white p-6 rounded-3xl shadow-glow flex flex-col justify-center items-start gap-2 transform hover:-translate-y-1 transition-transform duration-300 sm:translate-y-8">
+                  <span className="material-symbols-outlined text-4xl mb-2 opacity-80">verified_user</span>
+                  <h3 classNaWe="text-xl font-bold">Siap Pakai</h3>
+                  <p className="text-sm text-blue-100">Fasilitas Lengkap</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Schedule Section */}
-      <section id="schedule" className="py-12 lg:py-16">
-        <div className="container">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl lg:text-3xl font-bold mb-2">Jadwal Ruang Diskusi</h2>
-            <p className="text-muted-foreground">Lihat ketersediaan ruang secara real-time</p>
+      <section id="jadwal" className="py-20 bg-white dark:bg-surface-dark border-y border-slate-100 dark:border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mb-3">Timeline Ruangan</h2>
+              <p className="text-slate-500 dark:text-slate-400 font-medium text-lg">Pantau ketersediaan secara real-time</p>
+            </div>
+            <div className="bg-slate-100 dark:bg-background-dark p-1.5 rounded-2xl inline-flex self-start md:self-auto">
+              <button
+                onClick={() => setActiveTab('today')}
+                className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'today'
+                    ? 'bg-white dark:bg-surface-dark shadow-sm text-primary dark:text-white border border-slate-200 dark:border-slate-700'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                  }`}
+              >
+                Hari Ini
+              </button>
+              <button
+                onClick={() => setActiveTab('tomorrow')}
+                className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'tomorrow'
+                    ? 'bg-white dark:bg-surface-dark shadow-sm text-primary dark:text-white border border-slate-200 dark:border-slate-700'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                  }`}
+              >
+                Besok
+              </button>
+            </div>
           </div>
 
-          <Card>
-            <CardContent className="p-6">
-              <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-6">
-                  <TabsTrigger value="today">Hari Ini ({formatDate(getToday(), 'dd MMM')})</TabsTrigger>
-                  <TabsTrigger value="tomorrow">Besok ({formatDate(getTomorrow(), 'dd MMM')})</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="today">
-                  <ScheduleGrid bookings={todayBookings} isLoading={todayLoading} />
-                </TabsContent>
-                
-                <TabsContent value="tomorrow">
-                  {!isBookingWindowOpen() && (
-                    <div className="mb-6">
-                      <CountdownTimer />
-                    </div>
-                  )}
-                  <ScheduleGrid bookings={tomorrowBookings} isLoading={tomorrowLoading} />
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
+          <div className="bg-background-light dark:bg-background-dark rounded-3xl p-6 md:p-8 border border-border-light dark:border-border-dark overflow-hidden">
+            {activeTab === 'tomorrow' && !isBookingWindowOpen() && (
+              <div className="mb-6 flex justify-center">
+                <CountdownTimer />
+              </div>
+            )}
+
+            <ScheduleGrid
+              bookings={activeTab === 'today' ? todayBookings : tomorrowBookings}
+              isLoading={activeTab === 'today' ? todayLoading : tomorrowLoading}
+            />
+          </div>
         </div>
       </section>
 
       {/* Booking Form Section */}
-      <section id="booking" className="py-12 lg:py-16 bg-muted/30">
-        <div className="container">
-          <div className="max-w-3xl mx-auto">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl lg:text-3xl font-bold mb-2">Form Booking</h2>
-              <p className="text-muted-foreground">Isi form berikut untuk memesan ruang diskusi</p>
+      <section id="form-booking" className="max-w-6xl mx-auto px-4 sm:px-6 my-24 scroll-mt-28">
+        <div className="bg-white dark:bg-surface-dark rounded-[2.5rem] shadow-2xl shadow-blue-900/10 dark:shadow-none border border-slate-100 dark:border-border-dark overflow-hidden flex flex-col lg:flex-row">
+          <div className="flex-1 p-8 md:p-12 lg:p-16">
+            <div className="mb-10">
+              <span className="text-primary font-bold tracking-wider uppercase text-xs mb-2 block">Formulir Pemesanan</span>
+              <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white">Book Ruangan</h2>
+              <p className="text-slate-500 dark:text-slate-400 mt-2">Lengkapi data untuk memesan ruang diskusi.</p>
             </div>
 
-            <Card>
-              <CardContent className="p-6 lg:p-8">
-                <BookingForm />
-              </CardContent>
-            </Card>
+            {/* Real Booking Form */}
+            <BookingForm />
+          </div>
+
+          {/* Tips Sidebar */}
+          <div className="hidden lg:flex lg:w-2/5 bg-gradient-to-br from-blue-600 to-indigo-700 p-12 text-white flex-col justify-between relative overflow-hidden">
+            <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
+            <div className="absolute -right-20 -top-20 w-80 h-80 bg-blue-400/30 rounded-full blur-3xl"></div>
+            <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-purple-500/30 rounded-full blur-3xl"></div>
+
+            <div className="relative z-10">
+              <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center mb-8">
+                <span className="material-symbols-outlined text-2xl">tips_and_updates</span>
+              </div>
+              <h3 className="text-3xl font-bold mb-4 leading-tight">Tips Efisien Menggunakan Ruang Diskusi</h3>
+              <ul className="space-y-4 text-blue-100">
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="text-xl mt-0.5 shrink-0" />
+                  <span className="text-sm leading-relaxed">Booking H-1 untuk memastikan ketersediaan ruangan favorit Anda.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="text-xl mt-0.5 shrink-0" />
+                  <span className="text-sm leading-relaxed">Pastikan durasi meeting sesuai kebutuhan agar tidak mengganggu jadwal lain.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="text-xl mt-0.5 shrink-0" />
+                  <span className="text-sm leading-relaxed">Jaga kebersihan ruangan setelah digunakan untuk kenyamanan bersama.</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="relative z-10 bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/10 mt-auto">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-green-400 flex items-center justify-center text-white shadow-lg">
+                  <span className="material-symbols-outlined text-lg">support_agent</span>
+                </div>
+                <div>
+                  <p className="text-xs text-blue-200 uppercase tracking-wider font-semibold">Butuh Bantuan?</p>
+                  <p className="font-bold">+62 812-3456-7890</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-8 border-t border-border">
-        <div className="container text-center text-sm text-muted-foreground">
-          <p>© 2024 RuangBook - Sistem Booking Ruang Diskusi</p>
+      <footer className="py-12 bg-white dark:bg-surface-dark border-t border-slate-100 dark:border-border-dark mt-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white text-sm">
+              <span className="material-symbols-outlined text-lg">calendar_today</span>
+            </div>
+            <span className="font-bold text-slate-900 dark:text-white">RuangBook</span>
+          </div>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            © 2024 RuangBook System. All rights reserved.
+          </p>
+          <div className="flex gap-6">
+            <a href="#" className="text-slate-400 hover:text-primary transition-colors">Privacy</a>
+            <a href="#" className="text-slate-400 hover:text-primary transition-colors">Terms</a>
+            <a href="#" className="text-slate-400 hover:text-primary transition-colors">Help</a>
+          </div>
         </div>
       </footer>
-    </Layout>
+    </div>
   );
 };
 

@@ -15,6 +15,10 @@ export default {
     extend: {
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+        display: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+      },
+      backgroundImage: {
+        'grid-pattern': "radial-gradient(#3B82F6 1px, transparent 1px)",
       },
       colors: {
         border: "hsl(var(--border))",
