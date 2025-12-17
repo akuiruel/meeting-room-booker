@@ -197,22 +197,30 @@ const AdminDashboard = () => {
   const exportToPDF = () => {
     const doc = new jsPDF();
 
-    // Header Report
-    doc.setFillColor(59, 130, 246); // Primary Blue
+    // Modern Blue Theme Config
+    const bluePrimary = [37, 99, 235]; // blue-600
+    const blueLight = [239, 246, 255]; // blue-50
+    const textDark = [30, 41, 59];     // slate-800
+
+    // Header Background
+    doc.setFillColor(bluePrimary[0], bluePrimary[1], bluePrimary[2]);
     doc.rect(0, 0, 210, 40, 'F');
 
-    doc.setFontSize(22);
+    // Header Text
+    doc.setFontSize(24);
     doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
     doc.text('RuangBook Report', 14, 20);
 
+    // Subheader
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
+    doc.setTextColor(220, 220, 255);
     const periodeInfo = startDate && endDate
       ? `Periode: ${formatDate(startDate)} - ${formatDate(endDate)}`
       : 'Periode: Semua Data';
     doc.text(periodeInfo, 14, 30);
-    doc.text(`Tanggal Cetak: ${format(new Date(), 'dd MMMM yyyy HH:mm')}`, 14, 35);
+    doc.text(`Dicetak: ${format(new Date(), 'dd MMMM yyyy HH:mm')}`, 200, 30, { align: 'right' });
 
     const tableColumn = ["No", "Tanggal", "Ruang", "Nama", "Unit", "Jam", "Status"];
     const tableRows = filteredBookings.map((booking, index) => {
@@ -234,15 +242,19 @@ const AdminDashboard = () => {
       startY: 45,
       theme: 'grid',
       headStyles: {
-        fillColor: [59, 130, 246], // Blue header
+        fillColor: bluePrimary,
         textColor: [255, 255, 255],
         fontStyle: 'bold',
-        halign: 'center'
+        halign: 'center',
+        valign: 'middle',
+        cellPadding: 4
       },
       styles: {
         fontSize: 9,
         cellPadding: 3,
-        overflow: 'linebreak'
+        overflow: 'linebreak',
+        valign: 'middle',
+        textColor: textDark
       },
       columnStyles: {
         0: { halign: 'center', cellWidth: 15 }, // No
@@ -257,18 +269,28 @@ const AdminDashboard = () => {
           if (status === 'Aktif') {
             data.cell.styles.textColor = [16, 185, 129]; // Emerald Green
           } else if (status === 'Selesai') {
-            data.cell.styles.textColor = [59, 130, 246]; // Blue
+            data.cell.styles.textColor = bluePrimary; // Blue
           } else if (status === 'Dibatalkan') {
             data.cell.styles.textColor = [239, 68, 68]; // Red
           }
         }
       },
       alternateRowStyles: {
-        fillColor: [241, 245, 249] // Slate 50
+        fillColor: blueLight
       }
     });
 
-    doc.save(`booking-report-${startDate || 'all'}-to-${endDate || 'all'}.pdf`);
+    // Footer
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(150);
+      doc.text('RuangBook - Sistem Booking Ruang Diskusi', 14, 287);
+      doc.text(`Halaman ${i} dari ${pageCount}`, 200, 287, { align: 'right' });
+    }
+
+    doc.save(`RuangBook-Report-${startDate || 'all'}-${endDate || 'all'}.pdf`);
   };
 
   return (
