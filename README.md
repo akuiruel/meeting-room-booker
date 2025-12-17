@@ -59,6 +59,78 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
+- Firebase (Firestore & Authentication)
+
+## Firebase Setup
+
+This project uses Firebase for database and authentication. To set up Firebase:
+
+### 1. Firestore Database Structure
+
+Create the following collections in your Firestore database:
+
+**`bookings` collection:**
+```
+{
+  booking_date: string (YYYY-MM-DD),
+  usage_date: string (YYYY-MM-DD),
+  room: string ('ruang_diskusi_1' | 'ruang_diskusi_2' | 'ruang_diskusi_3'),
+  booker_name: string,
+  department: string ('PRTH' | 'DIRI' | 'SETTAMA' | 'PUSDATIN' | 'LAINNYA'),
+  participant_count: number,
+  start_time: string (HH:MM),
+  end_time: string (HH:MM),
+  notes: string (optional),
+  status: string ('confirmed' | 'cancelled'),
+  created_at: timestamp,
+  updated_at: timestamp
+}
+```
+
+**`user_roles` collection (for admin access):**
+```
+{
+  // Document ID should be the user's UID
+  role: string ('admin' | 'user')
+}
+```
+
+### 2. Create Composite Indexes
+
+Go to Firebase Console > Firestore Database > Indexes and create these composite indexes:
+
+1. **For booking queries by date:**
+   - Collection: `bookings`
+   - Fields: `status` (Ascending), `usage_date` (Ascending), `start_time` (Ascending)
+
+2. **For all bookings:**
+   - Collection: `bookings`
+   - Fields: `usage_date` (Descending), `start_time` (Ascending)
+
+3. **For availability check:**
+   - Collection: `bookings`
+   - Fields: `usage_date` (Ascending), `room` (Ascending), `status` (Ascending)
+
+### 3. Security Rules
+
+Add these Firestore security rules:
+
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /bookings/{bookingId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null;
+    }
+    
+    match /user_roles/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if false; // Only admins can write via Firebase Console
+    }
+  }
+}
 
 ## How can I deploy this project?
 

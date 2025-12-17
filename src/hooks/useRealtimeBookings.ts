@@ -1,29 +1,22 @@
 import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { collection, onSnapshot, query } from 'firebase/firestore';
+import { db } from '@/integrations/firebase/config';
 
 export const useRealtimeBookings = () => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    const channel = supabase
-      .channel('bookings-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'bookings',
-        },
-        () => {
-          // Invalidate all booking queries to refresh data
-          queryClient.invalidateQueries({ queryKey: ['bookings'] });
-        }
-      )
-      .subscribe();
+    // Set up real-time listener for bookings collection
+    const q = query(collection(db, 'bookings'));
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    const unsubscribe = onSnapshot(q, () => {
+      // Invalidate all booking queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['bookings'] });
+    }, (error) => {
+      console.error('Error listening to bookings:', error);
+    });
+
+    return () => unsubscribe();
   }, [queryClient]);
 };
