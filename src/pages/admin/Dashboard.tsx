@@ -27,7 +27,14 @@ import {
   FileSpreadsheet,
   FileText,
   Menu,
-  LayoutGrid
+  LayoutGrid,
+  Building2,
+  Briefcase,
+  CircleDot,
+  CalendarRange,
+  RefreshCcw,
+  ChevronUp,
+  CheckCircle2
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -294,6 +301,25 @@ const AdminDashboard = () => {
     doc.save(`RuangBook-Report-${startDate || 'all'}-${endDate || 'all'}.pdf`);
   };
 
+  // Calculate active filters count for the header subtitle
+  const activeFiltersCount = [
+    searchTerm,
+    roomFilter !== 'all' ? roomFilter : null,
+    departmentFilter !== 'all' ? departmentFilter : null,
+    statusFilter !== 'all' ? statusFilter : null,
+    startDate,
+    endDate
+  ].filter(Boolean).length;
+
+  const resetFilters = () => {
+    setSearchTerm('');
+    setRoomFilter('all');
+    setDepartmentFilter('all');
+    setStatusFilter('all');
+    setStartDate('');
+    setEndDate('');
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 font-display">
       {/* Sidebar */}
@@ -471,92 +497,147 @@ const AdminDashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Filters */}
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Filter className="h-4 w-4" />
-                Filter
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {/* Search & Filters */}
-              <div className="flex-1 lg:max-w-3xl">
+          {/* Filters - New Design */}
+          <Card className="mb-8 border-none shadow-lg shadow-slate-200/50 overflow-hidden rounded-2xl">
+            {/* Filter Header */}
+            <div className="bg-blue-600 p-6 flex items-center justify-between text-white">
+              <div className="flex items-center gap-4">
+                <div className="p-2 bg-white/10 rounded-xl backdrop-blur-sm">
+                  <Filter className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg leading-tight">Filter & Pencarian</h3>
+                  <p className="text-blue-100 text-sm font-medium opacity-90">
+                    {activeFiltersCount > 0 ? `${activeFiltersCount} filter aktif` : 'Tidak ada filter aktif'}
+                  </p>
+                </div>
+              </div>
+              <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 rounded-full">
+                <ChevronUp className="h-5 w-5" />
+              </Button>
+            </div>
+
+            <CardContent className="p-6 space-y-8 bg-white">
+              {/* Search Section */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-slate-700 font-semibold mb-1">
+                  <Search className="h-4 w-4" />
+                  <span className="text-sm">Pencarian Cepat</span>
+                </div>
+                <div className="relative group">
+                  <Search className="absolute left-4 top-3.5 h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                  <input
+                    className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all placeholder-slate-400 font-medium outline-none"
+                    placeholder="Cari berdasarkan nama, unit, atau keterangan..."
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Dropdowns Row */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Room Filter */}
                 <div className="space-y-3">
-                  <div className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 bg-white border border-slate-100 rounded-3xl shadow-sm">
-                    <div className="md:col-span-12 lg:col-span-4 relative group">
-                      <Search className="absolute left-4 top-3.5 h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-                      <input
-                        className="w-full pl-12 pr-6 py-3 bg-slate-50 border-0 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all placeholder-slate-400 font-medium outline-none"
-                        placeholder="Cari nama atau unit..."
-                        type="text"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                      />
-                    </div>
-
-                    {/* Date Filters - Integrated into the grid or separate row depending on space? Let's keep them here for now but clearer */}
-                    <div className="md:col-span-12 lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      {/* Room Filter */}
-                      <Select value={roomFilter} onValueChange={setRoomFilter}>
-                        <SelectTrigger className="w-full border-0 bg-slate-50 rounded-2xl px-4 py-6 h-auto text-slate-600 font-medium hover:bg-slate-100 transition-colors">
-                          <SelectValue placeholder="Semua Ruang" />
-                        </SelectTrigger>
-                        <SelectContent className="rounded-xl border-slate-100 shadow-xl">
-                          <SelectItem value="all">Semua Ruang</SelectItem>
-                          {ROOMS.map(r => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
-
-                      {/* Unit Filter */}
-                      <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-                        <SelectTrigger className="w-full border-0 bg-slate-50 rounded-2xl px-4 py-6 h-auto text-slate-600 font-medium hover:bg-slate-100 transition-colors">
-                          <SelectValue placeholder="Semua Unit" />
-                        </SelectTrigger>
-                        <SelectContent className="rounded-xl border-slate-100 shadow-xl">
-                          <SelectItem value="all">Semua Unit</SelectItem>
-                          {DEPARTMENTS.map(d => <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
-
-                      {/* Status Filter */}
-                      <Select value={statusFilter} onValueChange={setStatusFilter}>
-                        <SelectTrigger className="w-full border-0 bg-slate-50 rounded-2xl px-4 py-6 h-auto text-slate-600 font-medium hover:bg-slate-100 transition-colors">
-                          <SelectValue placeholder="Semua Status" />
-                        </SelectTrigger>
-                        <SelectContent className="rounded-xl border-slate-100 shadow-xl">
-                          <SelectItem value="all">Semua Status</SelectItem>
-                          <SelectItem value="confirmed">Aktif</SelectItem>
-                          <SelectItem value="completed">Selesai</SelectItem>
-                          <SelectItem value="cancelled">Dibatalkan</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                  <div className="flex items-center gap-2 text-slate-700 font-semibold mb-1">
+                    <Building2 className="h-4 w-4" />
+                    <span className="text-sm">Ruang</span>
                   </div>
+                  <Select value={roomFilter} onValueChange={setRoomFilter}>
+                    <SelectTrigger className="w-full bg-white border border-slate-200 rounded-xl px-4 py-6 h-auto text-slate-600 font-medium hover:border-blue-400 hover:ring-2 hover:ring-blue-50 transition-all focus:ring-2 focus:ring-blue-500 shadow-sm">
+                      <SelectValue placeholder="Pilih ruang" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-slate-100 shadow-xl">
+                      <SelectItem value="all">Semua Ruang</SelectItem>
+                      {ROOMS.map(r => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                  {/* Date Range - Separate Row for clarity */}
-                  <div className="flex flex-col sm:flex-row gap-4 mt-4">
-                    <div className="flex-1 bg-white border border-slate-100 rounded-2xl px-6 py-3 shadow-sm flex items-center gap-4 group focus-within:ring-2 focus-within:ring-blue-500 transition-all">
-                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider group-focus-within:text-blue-500">Mulai</span>
-                      <input
-                        type="date"
-                        value={startDate}
-                        onChange={e => setStartDate(e.target.value)}
-                        className="w-full bg-transparent border-none text-sm p-0 focus:ring-0 text-slate-700 font-medium"
-                      />
-                    </div>
-                    <div className="flex-1 bg-white border border-slate-100 rounded-2xl px-6 py-3 shadow-sm flex items-center gap-4 group focus-within:ring-2 focus-within:ring-blue-500 transition-all">
-                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider group-focus-within:text-blue-500">Sampai</span>
-                      <input
-                        type="date"
-                        value={endDate}
-                        onChange={e => setEndDate(e.target.value)}
-                        className="w-full bg-transparent border-none text-sm p-0 focus:ring-0 text-slate-700 font-medium"
-                      />
-                    </div>
+                {/* Unit Filter */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-slate-700 font-semibold mb-1">
+                    <Briefcase className="h-4 w-4" />
+                    <span className="text-sm">Unit</span>
+                  </div>
+                  <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+                    <SelectTrigger className="w-full bg-white border border-slate-200 rounded-xl px-4 py-6 h-auto text-slate-600 font-medium hover:border-blue-400 hover:ring-2 hover:ring-blue-50 transition-all focus:ring-2 focus:ring-blue-500 shadow-sm">
+                      <SelectValue placeholder="Pilih unit" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-slate-100 shadow-xl">
+                      <SelectItem value="all">Semua Unit</SelectItem>
+                      {DEPARTMENTS.map(d => <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Status Filter */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-slate-700 font-semibold mb-1">
+                    <CircleDot className="h-4 w-4 text-emerald-500" />
+                    <span className="text-sm">Status</span>
+                  </div>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-full bg-white border border-slate-200 rounded-xl px-4 py-6 h-auto text-slate-600 font-medium hover:border-blue-400 hover:ring-2 hover:ring-blue-50 transition-all focus:ring-2 focus:ring-blue-500 shadow-sm">
+                      <SelectValue placeholder="Pilih status" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-slate-100 shadow-xl">
+                      <SelectItem value="all">Semua Status</SelectItem>
+                      <SelectItem value="confirmed">Aktif</SelectItem>
+                      <SelectItem value="completed">Selesai</SelectItem>
+                      <SelectItem value="cancelled">Dibatalkan</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Date Filters */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-slate-700 font-semibold mb-1">
+                  <CalendarRange className="h-4 w-4" />
+                  <span className="text-sm">Periode Tanggal</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="relative group">
+                    <span className="absolute left-4 top-4 text-xs font-bold text-slate-400 uppercase tracking-wider group-focus-within:text-blue-500 z-10">Mulai</span>
+                    <input
+                      type="date"
+                      value={startDate}
+                      onChange={e => setStartDate(e.target.value)}
+                      className="w-full pl-20 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-slate-700 font-medium outline-none shadow-sm h-[52px]"
+                    />
+                  </div>
+                  <div className="relative group">
+                    <span className="absolute left-4 top-4 text-xs font-bold text-slate-400 uppercase tracking-wider group-focus-within:text-blue-500 z-10">Sampai</span>
+                    <input
+                      type="date"
+                      value={endDate}
+                      onChange={e => setEndDate(e.target.value)}
+                      className="w-full pl-22 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-slate-700 font-medium outline-none shadow-sm h-[52px] pl-[70px]"
+                    />
                   </div>
                 </div>
               </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-slate-100">
+                <Button
+                  variant="outline"
+                  onClick={resetFilters}
+                  className="w-full sm:w-1/2 py-6 rounded-xl border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold gap-2"
+                >
+                  <RefreshCcw className="h-4 w-4" />
+                  Reset Filter
+                </Button>
+                <Button
+                  className="w-full sm:w-1/2 py-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg shadow-blue-600/20 gap-2"
+                >
+                  <Search className="h-4 w-4" />
+                  Terapkan Filter
+                </Button>
+              </div>
+
             </CardContent>
           </Card>
 
