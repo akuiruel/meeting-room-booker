@@ -25,7 +25,8 @@ import {
   X,
   BarChart3,
   FileSpreadsheet,
-  FileText
+  FileText,
+  Menu
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -299,9 +300,25 @@ const AdminDashboard = () => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <Button variant="ghost" className="lg:hidden" onClick={signOut}>
-                <LogOut className="h-4 w-4" />
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="icon" className="lg:hidden">
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem asChild>
+                    <Link to="/" className="flex items-center cursor-pointer">
+                      <Home className="h-4 w-4 mr-2" />
+                      Beranda
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={signOut} className="text-destructive focus:text-destructive cursor-pointer">
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
 
