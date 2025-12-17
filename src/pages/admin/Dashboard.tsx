@@ -231,47 +231,47 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background-light dark:bg-background-dark font-display">
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-card hidden lg:block">
-        <div className="flex h-16 items-center gap-2 border-b border-border px-6">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <Calendar className="h-4 w-4 text-primary-foreground" />
+      <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-surface-dark hidden lg:block shadow-sm">
+        <div className="flex h-20 items-center gap-3 border-b border-slate-100 dark:border-slate-800 px-6">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-primary to-blue-400 text-white shadow-lg shadow-blue-500/20">
+            <Calendar className="h-5 w-5" />
           </div>
-          <span className="font-bold">RuangBook Admin</span>
+          <span className="font-extrabold text-lg text-slate-800 dark:text-white tracking-tight">RuangBook</span>
         </div>
 
-        <nav className="flex flex-col gap-1 p-4">
+        <nav className="flex flex-col gap-2 p-4 mt-2">
           <Link to="/admin/dashboard">
-            <Button variant="secondary" className="w-full justify-start gap-2">
-              <BarChart3 className="h-4 w-4" />
+            <Button variant="ghost" className="w-full justify-start gap-3 px-4 py-6 bg-blue-50 dark:bg-blue-900/20 text-primary font-bold hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-xl transition-all">
+              <BarChart3 className="h-5 w-5" />
               Dashboard
             </Button>
           </Link>
           <Link to="/">
-            <Button variant="ghost" className="w-full justify-start gap-2">
-              <Home className="h-4 w-4" />
+            <Button variant="ghost" className="w-full justify-start gap-3 px-4 py-6 text-slate-500 hover:text-primary hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-all">
+              <Home className="h-5 w-5" />
               Kembali ke Beranda
             </Button>
           </Link>
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 border-t border-border p-4">
-          <Button variant="ghost" className="w-full justify-start gap-2" onClick={signOut}>
-            <LogOut className="h-4 w-4" />
+        <div className="absolute bottom-0 left-0 right-0 border-t border-slate-100 dark:border-slate-800 p-6">
+          <Button variant="ghost" className="w-full justify-start gap-3 px-4 py-6 text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all" onClick={signOut}>
+            <LogOut className="h-5 w-5" />
             Logout
           </Button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="lg:pl-64">
-        <div className="container py-8">
+      <main className="lg:pl-64 min-h-screen">
+        <div className="container max-w-7xl mx-auto py-10 px-6">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
             <div>
-              <h1 className="text-2xl font-bold">Dashboard</h1>
-              <p className="text-muted-foreground">Kelola semua booking ruang diskusi</p>
+              <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Dashboard</h1>
+              <p className="text-slate-500 dark:text-slate-400 mt-1">Kelola semua booking ruang diskusi dengan mudah</p>
             </div>
             <div className="flex items-center gap-2">
               <Button variant="outline" onClick={exportToPDF} className="gap-2 hidden sm:flex">

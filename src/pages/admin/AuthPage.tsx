@@ -65,7 +65,7 @@ const AuthPage = () => {
     setIsLoading(true);
     const { error } = await signIn(data.email, data.password);
     setIsLoading(false);
-    
+
     if (!error) {
       navigate('/admin/dashboard');
     }
@@ -75,15 +75,16 @@ const AuthPage = () => {
     setIsLoading(true);
     const { error } = await signUp(data.email, data.password);
     setIsLoading(false);
-    
+
     if (!error) {
       navigate('/admin/dashboard');
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md animate-fade-in">
+    <div className="min-h-screen flex items-center justify-center bg-background-light dark:bg-background-dark p-4 relative overflow-hidden">
+      <div className="absolute inset-0 z-0 bg-grid-pattern opacity-[0.03] dark:opacity-[0.05] pointer-events-none"></div>
+      <Card className="w-full max-w-md animate-fade-in relative z-10 shadow-2xl dark:shadow-none border-border-light dark:border-border-dark">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary">
             <Lock className="h-6 w-6 text-primary-foreground" />
