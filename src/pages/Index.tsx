@@ -1,12 +1,11 @@
-import { useState, useEffect } from 'react';
-import { Calendar, Users, Clock, ArrowRight, Settings, Moon, Sun, CheckCircle, Info } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import { ArrowRight, Settings, CheckCircle } from 'lucide-react';
 import { ScheduleGrid } from '@/components/schedule/ScheduleGrid';
 import { CountdownTimer } from '@/components/schedule/CountdownTimer';
 import { BookingForm } from '@/components/booking/BookingForm';
 import { useTodayBookings, useTomorrowBookings } from '@/hooks/useBookings';
 import { useRealtimeBookings } from '@/hooks/useRealtimeBookings';
-import { formatDate, getToday, getTomorrow, isBookingWindowOpen } from '@/lib/dateUtils';
+import { isBookingWindowOpen } from '@/lib/dateUtils';
 import { Link } from 'react-router-dom';
 
 const Index = () => {
@@ -15,11 +14,6 @@ const Index = () => {
   const { data: tomorrowBookings = [], isLoading: tomorrowLoading } = useTomorrowBookings();
 
   useRealtimeBookings();
-
-  // Dark mode toggle
-  const toggleDarkMode = () => {
-    document.documentElement.classList.toggle('dark');
-  };
 
   return (
     <div className="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-100 font-display transition-colors duration-300 antialiased selection:bg-primary selection:text-white min-h-screen">
@@ -43,13 +37,6 @@ const Index = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              <button
-                className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
-                onClick={toggleDarkMode}
-              >
-                <Moon className="h-5 w-5 dark:hidden" />
-                <Sun className="h-5 w-5 hidden dark:block text-yellow-400" />
-              </button>
               <Link to="/admin/auth" className="hidden sm:flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 hover:shadow-md transition-all">
                 <Settings className="h-5 w-5" />
                 Admin
@@ -124,7 +111,7 @@ const Index = () => {
                 </div>
                 <div className="bg-gradient-to-br from-primary to-blue-600 text-white p-6 rounded-3xl shadow-glow flex flex-col justify-center items-start gap-2 transform hover:-translate-y-1 transition-transform duration-300 sm:translate-y-8">
                   <span className="material-symbols-outlined text-4xl mb-2 opacity-80">verified_user</span>
-                  <h3 classNaWe="text-xl font-bold">Siap Pakai</h3>
+                  <h3 className="text-xl font-bold">Siap Pakai</h3>
                   <p className="text-sm text-blue-100">Fasilitas Lengkap</p>
                 </div>
               </div>
@@ -145,8 +132,8 @@ const Index = () => {
               <button
                 onClick={() => setActiveTab('today')}
                 className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'today'
-                  ? 'bg-white dark:bg-surface-dark shadow-sm text-primary dark:text-white border border-slate-200 dark:border-slate-700'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                    ? 'bg-white dark:bg-surface-dark shadow-sm text-primary dark:text-white border border-slate-200 dark:border-slate-700'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                   }`}
               >
                 Hari Ini
@@ -154,8 +141,8 @@ const Index = () => {
               <button
                 onClick={() => setActiveTab('tomorrow')}
                 className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'tomorrow'
-                  ? 'bg-white dark:bg-surface-dark shadow-sm text-primary dark:text-white border border-slate-200 dark:border-slate-700'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                    ? 'bg-white dark:bg-surface-dark shadow-sm text-primary dark:text-white border border-slate-200 dark:border-slate-700'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                   }`}
               >
                 Besok
@@ -218,7 +205,6 @@ const Index = () => {
                 </li>
               </ul>
             </div>
-
           </div>
         </div>
       </section>

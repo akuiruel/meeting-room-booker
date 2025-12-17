@@ -104,7 +104,7 @@ export const ScheduleGrid = ({ bookings, isLoading }: ScheduleGridProps) => {
                           'text-xs font-bold block mb-0.5',
                           isBooked ? 'text-destructive' : 'text-success'
                         )}>
-                          {isBooked ? 'Terisi' : 'Open'}
+                          {isBooked ? 'Terisi' : 'Tersedia'}
                         </span>
                       </div>
                     </TooltipTrigger>
