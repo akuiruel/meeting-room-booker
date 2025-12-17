@@ -34,14 +34,12 @@ const Index = () => {
               </div>
               <div>
                 <span className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white block leading-none">RuangBook</span>
-                <span className="text-xs font-semibold text-primary uppercase tracking-wider">Dashboard</span>
               </div>
             </div>
 
             <div className="hidden md:flex items-center space-x-1 bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark p-1.5 rounded-2xl shadow-sm">
               <a href="#" className="px-6 py-2.5 text-sm font-bold text-white bg-primary rounded-xl shadow-md transition-all transform hover:scale-[1.02]">Beranda</a>
               <a href="#jadwal" className="px-6 py-2.5 text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-all">Jadwal</a>
-              <a href="#history" className="px-6 py-2.5 text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-all">Riwayat</a>
             </div>
 
             <div className="flex items-center gap-3">
@@ -140,15 +138,15 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
             <div>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mb-3">Timeline Ruangan</h2>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mb-3">Jadwal Ruangan</h2>
               <p className="text-slate-500 dark:text-slate-400 font-medium text-lg">Pantau ketersediaan secara real-time</p>
             </div>
             <div className="bg-slate-100 dark:bg-background-dark p-1.5 rounded-2xl inline-flex self-start md:self-auto">
               <button
                 onClick={() => setActiveTab('today')}
                 className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'today'
-                    ? 'bg-white dark:bg-surface-dark shadow-sm text-primary dark:text-white border border-slate-200 dark:border-slate-700'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                  ? 'bg-white dark:bg-surface-dark shadow-sm text-primary dark:text-white border border-slate-200 dark:border-slate-700'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                   }`}
               >
                 Hari Ini
@@ -156,8 +154,8 @@ const Index = () => {
               <button
                 onClick={() => setActiveTab('tomorrow')}
                 className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'tomorrow'
-                    ? 'bg-white dark:bg-surface-dark shadow-sm text-primary dark:text-white border border-slate-200 dark:border-slate-700'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                  ? 'bg-white dark:bg-surface-dark shadow-sm text-primary dark:text-white border border-slate-200 dark:border-slate-700'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                   }`}
               >
                 Besok
@@ -221,17 +219,6 @@ const Index = () => {
               </ul>
             </div>
 
-            <div className="relative z-10 bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/10 mt-auto">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-green-400 flex items-center justify-center text-white shadow-lg">
-                  <span className="material-symbols-outlined text-lg">support_agent</span>
-                </div>
-                <div>
-                  <p className="text-xs text-blue-200 uppercase tracking-wider font-semibold">Butuh Bantuan?</p>
-                  <p className="font-bold">+62 812-3456-7890</p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
