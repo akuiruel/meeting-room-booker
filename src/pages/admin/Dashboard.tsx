@@ -179,6 +179,7 @@ const AdminDashboard = () => {
 
   const exportToCSV = () => {
     const headers = ['No', 'Tanggal Booking', 'Tanggal Penggunaan', 'Ruang', 'Nama', 'Unit Kerja', 'Jam', 'Peserta', 'Status', 'Catatan'];
+    const totalParticipants = filteredBookings.reduce((sum, b) => sum + (Number(b.participant_count) || 0), 0);
     const rows = filteredBookings.map((booking, index) => {
       const status = getComputedStatus(booking);
       return [
@@ -194,6 +195,10 @@ const AdminDashboard = () => {
         booking.notes || '-'
       ];
     });
+
+    // Add total row
+    rows.push(['', '', '', '', '', '', 'TOTAL PESERTA', totalParticipants.toString(), '', '']);
+
     const csvContent = [headers.join(','), ...rows.map((row) => row.map((cell) => `"${cell}"`).join(','))].join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
@@ -230,7 +235,9 @@ const AdminDashboard = () => {
     doc.text(periodeInfo, 14, 30);
     doc.text(`Dicetak: ${format(new Date(), 'dd MMMM yyyy HH:mm')}`, 200, 30, { align: 'right' });
 
-    const tableColumn = ["No", "Tanggal", "Ruang", "Nama", "Unit", "Jam", "Status"];
+    const tableColumn = ["No", "Tanggal", "Ruang", "Nama", "Unit", "Jam", "Peserta", "Status"];
+    const totalParticipants = filteredBookings.reduce((sum, b) => sum + (Number(b.participant_count) || 0), 0);
+
     const tableRows = filteredBookings.map((booking, index) => {
       const status = getComputedStatus(booking);
       return [
@@ -240,6 +247,7 @@ const AdminDashboard = () => {
         booking.booker_name,
         booking.department,
         `${formatTime(booking.start_time)} - ${formatTime(booking.end_time)}`,
+        booking.participant_count,
         getStatusLabel(status),
       ];
     });
@@ -265,14 +273,15 @@ const AdminDashboard = () => {
         textColor: textDark
       },
       columnStyles: {
-        0: { halign: 'center', cellWidth: 15 }, // No
-        1: { cellWidth: 30 }, // Tanggal
-        2: { cellWidth: 30 }, // Ruang
-        5: { halign: 'center' }, // Jam
-        6: { halign: 'center', fontStyle: 'bold' }  // Status
+        0: { halign: 'center', cellWidth: 10 }, // No
+        1: { cellWidth: 25 }, // Tanggal
+        2: { cellWidth: 25 }, // Ruang
+        5: { halign: 'center', cellWidth: 35 }, // Jam
+        6: { halign: 'center', cellWidth: 15 }, // Peserta
+        7: { halign: 'center', fontStyle: 'bold', cellWidth: 20 }  // Status
       },
       didParseCell: function (data) {
-        if (data.section === 'body' && data.column.index === 6) {
+        if (data.section === 'body' && data.column.index === 7) {
           const status = data.cell.raw;
           if (status === 'Aktif') {
             data.cell.styles.textColor = [16, 185, 129]; // Emerald Green
@@ -287,6 +296,13 @@ const AdminDashboard = () => {
         fillColor: blueLight
       }
     });
+
+    // Add total participants summary
+    const finalY = (doc as any).lastAutoTable.finalY + 10;
+    doc.setFontSize(11);
+    doc.setTextColor(textDark[0], textDark[1], textDark[2]);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Total Peserta: ${totalParticipants}`, 200, finalY, { align: 'right' });
 
     // Footer
     const pageCount = doc.internal.getNumberOfPages();
@@ -621,20 +637,14 @@ const AdminDashboard = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-slate-100">
+              <div className="flex justify-center pt-4 border-t border-slate-100">
                 <Button
                   variant="outline"
                   onClick={resetFilters}
-                  className="w-full sm:w-1/2 py-6 rounded-xl border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold gap-2"
+                  className="w-full sm:w-1/2 py-6 rounded-xl border-blue-200 text-blue-600 hover:bg-blue-50 hover:text-blue-700 font-bold gap-2 shadow-sm transition-all"
                 >
                   <RefreshCcw className="h-4 w-4" />
                   Reset Filter
-                </Button>
-                <Button
-                  className="w-full sm:w-1/2 py-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg shadow-blue-600/20 gap-2"
-                >
-                  <Search className="h-4 w-4" />
-                  Terapkan Filter
                 </Button>
               </div>
 
