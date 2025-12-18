@@ -70,7 +70,7 @@ export const BookingForm = () => {
     defaultValues: {
       booker_name: '',
       participant_count: 1,
-      usage_date: getTomorrowDateString(),
+      usage_date: getTodayDateString(),
       notes: '',
     },
   });
