@@ -34,7 +34,8 @@ import {
   CalendarRange,
   RefreshCcw,
   ChevronUp,
-  CheckCircle2
+  CheckCircle2,
+  Trash2
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -73,7 +74,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useAuth } from '@/hooks/useAuth';
-import { useAllBookings, useCancelBooking } from '@/hooks/useBookings';
+import { useAllBookings, useCancelBooking, useDeleteBooking } from '@/hooks/useBookings';
 import { ROOMS, DEPARTMENTS, getRoomLabel, Booking, RoomType, DepartmentType } from '@/types/booking';
 import { formatDate, formatTime, getTodayDateString } from '@/lib/dateUtils';
 
@@ -81,6 +82,7 @@ const AdminDashboard = () => {
   const { signOut } = useAuth();
   const { data: bookings = [], isLoading } = useAllBookings();
   const cancelBooking = useCancelBooking();
+  const deleteBooking = useDeleteBooking();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [roomFilter, setRoomFilter] = useState<string>('all');
@@ -89,6 +91,7 @@ const AdminDashboard = () => {
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
 
   // Helper to determine real-time status
@@ -177,6 +180,14 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleDeleteBooking = async () => {
+    if (selectedBooking) {
+      await deleteBooking.mutateAsync(selectedBooking.id);
+      setDeleteDialogOpen(false);
+      setSelectedBooking(null);
+    }
+  };
+
   const exportToCSV = () => {
     const headers = ['No', 'Tanggal Booking', 'Tanggal Penggunaan', 'Ruang', 'Nama', 'Unit Kerja', 'Jam', 'Peserta', 'Status', 'Catatan'];
     const totalParticipants = filteredBookings.reduce((sum, b) => sum + (Number(b.participant_count) || 0), 0);
@@ -211,9 +222,9 @@ const AdminDashboard = () => {
     const doc = new jsPDF();
 
     // Modern Blue Theme Config
-    const bluePrimary = [37, 99, 235]; // blue-600
-    const blueLight = [239, 246, 255]; // blue-50
-    const textDark = [30, 41, 59];     // slate-800
+    const bluePrimary: [number, number, number] = [37, 99, 235]; // blue-600
+    const blueLight: [number, number, number] = [239, 246, 255]; // blue-50
+    const textDark: [number, number, number] = [30, 41, 59];     // slate-800
 
     // Header Background
     doc.setFillColor(bluePrimary[0], bluePrimary[1], bluePrimary[2]);
@@ -259,7 +270,7 @@ const AdminDashboard = () => {
       theme: 'grid',
       headStyles: {
         fillColor: bluePrimary,
-        textColor: [255, 255, 255],
+        textColor: [255, 255, 255] as [number, number, number],
         fontStyle: 'bold',
         halign: 'center',
         valign: 'middle',
@@ -284,11 +295,11 @@ const AdminDashboard = () => {
         if (data.section === 'body' && data.column.index === 7) {
           const status = data.cell.raw;
           if (status === 'Aktif') {
-            data.cell.styles.textColor = [16, 185, 129]; // Emerald Green
+            data.cell.styles.textColor = [16, 185, 129] as [number, number, number]; // Emerald Green
           } else if (status === 'Selesai') {
             data.cell.styles.textColor = bluePrimary; // Blue
           } else if (status === 'Dibatalkan') {
-            data.cell.styles.textColor = [239, 68, 68]; // Red
+            data.cell.styles.textColor = [239, 68, 68] as [number, number, number]; // Red
           }
         }
       },
@@ -305,7 +316,7 @@ const AdminDashboard = () => {
     doc.text(`Total Peserta: ${totalParticipants}`, 200, finalY, { align: 'right' });
 
     // Footer
-    const pageCount = doc.internal.getNumberOfPages();
+    const pageCount = (doc as any).internal.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
       doc.setFontSize(8);
@@ -729,27 +740,37 @@ const AdminDashboard = () => {
                               </Badge>
                             </TableCell>
                             <TableCell>
-                              {status === 'confirmed' && (
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                                      <MoreHorizontal className="h-4 w-4" />
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  {status === 'confirmed' && (
                                     <DropdownMenuItem
                                       onClick={() => {
                                         setSelectedBooking(booking);
                                         setCancelDialogOpen(true);
                                       }}
-                                      className="text-destructive"
+                                      className="text-amber-600"
                                     >
                                       <X className="h-4 w-4 mr-2" />
                                       Batalkan
                                     </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              )}
+                                  )}
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      setSelectedBooking(booking);
+                                      setDeleteDialogOpen(true);
+                                    }}
+                                    className="text-destructive"
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Hapus
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </TableCell>
                           </TableRow>
                         );
@@ -769,16 +790,37 @@ const AdminDashboard = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Batalkan Booking?</AlertDialogTitle>
             <AlertDialogDescription>
-              Apakah Anda yakin ingin membatalkan booking ini? Tindakan ini tidak dapat dibatalkan.
+              Apakah Anda yakin ingin membatalkan booking ini? Status akan berubah menjadi "Dibatalkan".
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Tidak</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleCancelBooking}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-amber-600 text-white hover:bg-amber-700"
             >
               Ya, Batalkan
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Booking?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus booking ini secara permanen? Tindakan ini tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteBooking}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Ya, Hapus Permanen
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

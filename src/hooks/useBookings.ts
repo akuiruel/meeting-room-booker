@@ -7,6 +7,7 @@ import {
   getDocs,
   addDoc,
   updateDoc,
+  deleteDoc,
   doc,
   Timestamp,
   serverTimestamp
@@ -220,6 +221,33 @@ export const useCancelBooking = () => {
     onError: (error: Error) => {
       toast({
         title: 'Gagal Membatalkan Booking',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+};
+export const useDeleteBooking = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const bookingRef = doc(db, BOOKINGS_COLLECTION, id);
+      await deleteDoc(bookingRef);
+      return id;
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['bookings'] });
+
+      toast({
+        title: 'Booking Dihapus',
+        description: 'Booking telah berhasil dihapus secara permanen.',
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Gagal Menghapus Booking',
         description: error.message,
         variant: 'destructive',
       });

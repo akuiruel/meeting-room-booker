@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { format, addDays } from 'date-fns';
-import { CalendarIcon, Users, Building2, Clock, MessageSquare } from 'lucide-react';
+import { CalendarIcon, Users, Building2, Clock, MessageSquare, Monitor, Laptop } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -347,9 +347,14 @@ export const BookingForm = () => {
                         />
                         <Label
                           htmlFor={room.value}
-                          className="flex flex-col items-center justify-center rounded-lg border-2 border-muted bg-card p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 cursor-pointer transition-all"
+                          className="flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-muted bg-card p-6 h-full hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-blue-600 peer-data-[state=checked]:bg-blue-50/50 cursor-pointer transition-all shadow-sm"
                         >
-                          <span className="text-sm font-medium">{room.label}</span>
+                          <div className="p-3 rounded-full bg-slate-100 peer-data-[state=checked]:bg-blue-600 peer-data-[state=checked]:text-white transition-colors">
+                            {room.value === 'ruang_diskusi_1' && <Monitor className="h-6 w-6" />}
+                            {room.value === 'ruang_diskusi_2' && <Users className="h-6 w-6" />}
+                            {room.value === 'ruang_diskusi_3' && <Laptop className="h-6 w-6" />}
+                          </div>
+                          <span className="text-sm font-bold">{room.label}</span>
                         </Label>
                       </div>
                     ))}
